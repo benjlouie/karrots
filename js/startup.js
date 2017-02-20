@@ -11,8 +11,10 @@ function startup_localStorage() {
     var LSVars = [
         ["topNavDisplay", "hidden"],
         ["topNavFile", "html/topnav/student"],
+        ["topNavSelection", ""],
         ["sideNavDisplay", "hidden_maximized"],
         ["sideNavFile", "html/sidenav/account.html"],
+        ["sideNavSelection", ""],
         ["mainContentFile", ""],
         ["loginContentFile", "html/login.html"],
         ["accountType", "none"]
