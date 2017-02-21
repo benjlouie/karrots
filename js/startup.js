@@ -9,15 +9,16 @@ window.onload = function () {
 function startup_localStorage() {
     //array of [LSItem, defaultValue]
     var LSVars = [
+        ["loginContentFile", "html/login.html"],
+        ["accountType", "none"],
         ["topNavDisplay", "hidden"],
         ["topNavFile", "html/topnav/student"],
         ["topNavSelection", ""],
         ["sideNavDisplay", "hidden_maximized"],
         ["sideNavFile", "html/sidenav/account.html"],
-        ["sideNavSelection", ""],
+        ["sideNavSelection", 1],
         ["mainContentFile", ""],
-        ["loginContentFile", "html/login.html"],
-        ["accountType", "none"]
+        ["mainContentCalendar", false]
     ];
 
     for (var i = 0; i < LSVars.length; i++) {

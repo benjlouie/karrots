@@ -1,0 +1,9 @@
+﻿/* all styles should start with 'mc_' */
+
+.mc_selectedClassList {
+    display: inline-block;
+}
+
+.mc_scheduleCalendar {
+    display: inline-block;
+}
