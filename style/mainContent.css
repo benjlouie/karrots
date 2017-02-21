@@ -18,7 +18,7 @@
     display: block;
 
     position: relative;
-    min-height: 50%;
+    min-height: 55%;
     max-height: 55%;
     width: 25%; /*paired with .mc_scheduleCalendar*/
     height: auto;
@@ -39,14 +39,25 @@
     white-space: nowrap; /*TODO: change? what if list gets too small?*/
     padding: 2px 2px 2px 2px;
 }
+.mc_sideList a:hover {
+    background-color: black;
+    cursor: pointer;
+}
 .mc_sideListDetail {
-    transition: 03s;
-}
-.mc_sideListDetail a {
-    color: #adada6;
-    padding: 2px 2px 2px 10px;
-}
+    font-size: 0;
+    opacity: 0;
+    max-height: 0px;
 
+    transition: 0.2s;
+
+    color: #adada6;
+    padding: 0px;
+    white-space: nowrap;
+    overflow-x: scroll; /*because lol, horizontal scroll is now a thing*/
+}
+.mc_sideListDetail::-webkit-scrollbar {
+    display:none;
+}
 .mc_scheduleCalendar {
     float: left;
     max-height: 60%;

@@ -1,5 +1,23 @@
-﻿//methods used by maincontent
+﻿//functions used by maincontent
+//all functions should use 'mc_' as prefix
+//TODO: ensure above
 
+//takes in the <a> that was clicked and toggles its associated div 
+function mc_sideListDetailToggle(element) {
+    var liChildren = element.parentNode.children;
+    var details = liChildren[1]; //div
+    if (details.style.maxHeight == "0px" || details.style.maxHeight == "") {
+        details.style.maxHeight = "1000px";
+        details.style.padding = "2px 2px 2px 10px";
+        details.style.opacity = "1";
+        details.style.fontSize = "initial";
+    } else {
+        details.style.maxHeight = "0px";
+        details.style.padding = "0px";
+        details.style.opacity = "0";
+        details.style.fontSize = "0";
+    }
+}
 
 function makeCalendar() {
     //init calendar
