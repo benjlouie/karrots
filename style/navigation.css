@@ -158,15 +158,3 @@ nav div ul li a:focus {
     padding: 0px;
     margin: 0px;
 }
-
-/*main content*/
-.main_content {
-    height:100%;
-    position:fixed;
-    overflow-y: auto;
-    padding-left: 2px;
-}
-
-#mainContent {
-    transition: margin-left 0.3s;
-}

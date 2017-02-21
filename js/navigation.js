@@ -75,7 +75,7 @@ function highlightSelectionTopNav() {
 
 //go back to start page
 function logoClick() {
-    localStorage.setItem("sideNavFile", "html/sidenav/account.html");
+    localStorage.setItem("sideNavFile", "");
     localStorage.setItem("mainContentFile", "html/maincontent/startpage.html");
     localStorage.setItem("topNavSelection", "");
 
@@ -84,7 +84,7 @@ function logoClick() {
     //open mainContent
     $("#mainContent").load(localStorage.getItem("mainContentFile")); //load maincontent
     var mainContent = document.getElementById("mainContent");
-    mainContent.style.marginLeft = "0px";
+    mainContent.style.left = "0px";
 }
 
 /*sidenav opening/closing*/
@@ -157,7 +157,7 @@ function minimizeSideNav() {
     });
 
     var mainContent = document.getElementById("mainContent");
-    mainContent.style.marginLeft = "42px";
+    mainContent.style.left = "42px";
 }
 
 function maximizeSideNav() {
@@ -168,7 +168,7 @@ function maximizeSideNav() {
     //load currently selected tab
     $("#sideNav").load(localStorage.getItem("sideNavFile"), highlightSelectionSideNav);
     var mainContent = document.getElementById("mainContent");
-    mainContent.style.marginLeft = "202px";
+    mainContent.style.left = "202px";
 
     localStorage.setItem("sideNavDisplay", "maximized"); //save sidenav as maximized
 }
@@ -213,7 +213,7 @@ function highlightSelectionSideNav(element) {
     var sideNav = document.getElementById("sideNav");
     var ul = sideNav.firstElementChild;
     var lis = ul.children;
-    var sideNavSelection = localStorage.getItem("sideNavSelection");
+    var sideNavSelection = localStorage.getItem("sideNavSelection"); //actually a string, but javascript?
 
     for (var i = 0; i < lis.length; i++) {
         //firstChild is <a>
@@ -239,7 +239,7 @@ function startupMainContent() {
     var mainContentFile = localStorage.getItem("mainContentFile");
     if (mainContentFile != "") {
         //there is a file, load it
-        if (localStorage.getItem("mainContentCalendar")) {
+        if (localStorage.getItem("mainContentCalendar") == "true") {
             $("#mainContent").load(localStorage.getItem("mainContentFile"), makeCalendar);
         } else {
             $("#mainContent").load(localStorage.getItem("mainContentFile"));
@@ -276,7 +276,7 @@ function openMainContent_Account_Settings(element) {
 
 //Registration
 function openMainContent_Registration_Status(element) {
-    openMainContent_master(element, "html/maincontent/registration/summary.html", 1, false);
+    openMainContent_master(element, "html/maincontent/registration/status.html", 1, false);
 }
 function openMainContent_Registration_Schedule(element) {
     openMainContent_master(element, "html/maincontent/registration/schedule.html", 2, true);
@@ -309,26 +309,7 @@ function openMainContent_Employee_Pay(element) {
 
 //mockups
 function openMainContent_Mockups_ClassSchedule(element) {
-    openMainContent_master(element, "html/maincontent/mockups/schedule.html", 3, true);
-}
-
-function makeCalendar() {
-    //init calendar
-    var calendar = document.getElementById("calendar");
-    if (!calendar) {
-        //no calendar, stop
-        return;
-    }
-
-    $("#calendar").fullCalendar({
-        //put options and callbacks here
-        dayClick: function () {
-            alert("you clicked a day!");
-        }
-    });
-
-    //change calendar view to weekly adenda style
-    $("#calendar").fullCalendar("changeView", "agendaWeek");
+    openMainContent_master(element, "html/maincontent/mockups/schedule.html", 1, true);
 }
 ////////////////////////////
 

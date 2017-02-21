@@ -6,16 +6,20 @@ window.onload = function () {
     startup_contentCalls();
 };
 
+window.onresize = function () {
+    adjustCalendarHeight();
+}
+
 function startup_localStorage() {
     //array of [LSItem, defaultValue]
     var LSVars = [
         ["loginContentFile", "html/login.html"],
         ["accountType", "none"],
         ["topNavDisplay", "hidden"],
-        ["topNavFile", "html/topnav/student"],
+        ["topNavFile", ""],
         ["topNavSelection", ""],
         ["sideNavDisplay", "hidden_maximized"],
-        ["sideNavFile", "html/sidenav/account.html"],
+        ["sideNavFile", ""],
         ["sideNavSelection", 1],
         ["mainContentFile", ""],
         ["mainContentCalendar", false]
