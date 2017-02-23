@@ -260,18 +260,19 @@ function mainContentLoader() {
     //load calendar after everything else, need these
     var d1 = new $.Deferred();
     //var d2 = new $.Deferred();
+    if (localStorage.getItem("mainContentCalendar") == "true") {
+        $.when(d1/*, d2*/).then(function () {
+            makeCalendar();
+        })
+    }
 
     //menuBar loading
     if (localStorage.getItem("mainContentMenuBar") == "true") {
         var splitPos = mainContentFile.length - 5; //string without ending ".html"
         var menuBarFile = mainContentFile.substr(0, splitPos) + "_menuBar.html";
         $("#mc_menuBar").load(menuBarFile, function () { d1.resolve(); });
-    }
-    //calendar loading
-    if (localStorage.getItem("mainContentCalendar") == "true") {
-        $.when(d1/*, d2*/).then(function () {
-            makeCalendar();
-        })
+    } else {
+        d1.resolve();
     }
 }
 

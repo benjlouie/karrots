@@ -26,10 +26,9 @@ function makeCalendar() {
     }
 
     var calendar = $("#calendar");
-    var classList = document.getElementById("mc_selectedClassList");
 
     calendar.fullCalendar({
-        height: classList.clientHeight,
+        height: 500, //TODO: find a way to make this better
         header: false,
 
         views: {
@@ -69,6 +68,7 @@ function makeCalendar() {
 
     //change calendar view to weekly adenda style
     calendar.fullCalendar("changeView", "sevenDaySchedule");
+    adjustCalendarHeight();
 }
 
 function adjustCalendarHeight() {
