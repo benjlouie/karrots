@@ -32,6 +32,11 @@ function login() {
     startupMainContent();
 }
 
+function logout() {
+    localStorage.clear();
+    location.reload();
+}
+
 function removeLogin() {
     var loginContent = document.getElementById("loginContent");
     while (loginContent.firstChild) {
@@ -46,7 +51,7 @@ function startupTopNav() {
     var topNavDisplay = localStorage.getItem("topNavDisplay");
     var topNav = document.getElementById("topNav");
     if (topNavDisplay == "hidden") {
-        topNav.style.display = "hidden";
+        topNav.style.display = "none";
     } else if (topNavDisplay == "show") {
         topNav.style.display = "initial";
         //highlight correct selection after load
@@ -239,77 +244,96 @@ function startupMainContent() {
     var mainContentFile = localStorage.getItem("mainContentFile");
     if (mainContentFile != "") {
         //there is a file, load it
-        if (localStorage.getItem("mainContentCalendar") == "true") {
-            $("#mainContent").load(localStorage.getItem("mainContentFile"), makeCalendar);
-        } else {
-            $("#mainContent").load(localStorage.getItem("mainContentFile"));
+        $("#mainContent").load(localStorage.getItem("mainContentFile"), mainContentLoader);
+    } else {
+        //clear main content
+        var mainContent = document.getElementById("mainContent");
+        while (mainContent.firstChild) {
+            mainContent.removeChild(mainContent.firstChild);
         }
     }
 }
 
+function mainContentLoader() {
+    var mainContentFile = localStorage.getItem("mainContentFile");
+
+    //load calendar after everything else, need these
+    var d1 = new $.Deferred();
+    //var d2 = new $.Deferred();
+
+    //menuBar loading
+    if (localStorage.getItem("mainContentMenuBar") == "true") {
+        var splitPos = mainContentFile.length - 5; //string without ending ".html"
+        var menuBarFile = mainContentFile.substr(0, splitPos) + "_menuBar.html";
+        $("#mc_menuBar").load(menuBarFile, function () { d1.resolve(); });
+    }
+    //calendar loading
+    if (localStorage.getItem("mainContentCalendar") == "true") {
+        $.when(d1/*, d2*/).then(function () {
+            makeCalendar();
+        })
+    }
+}
+
 //loads in the mainContent
-function openMainContent_master(element, mainContentFile, sideNavSelection, calendar) {
+function openMainContent_master(element, mainContentFile, sideNavSelection, calendar, menuBar) {
     localStorage.setItem("mainContentFile", mainContentFile);
     localStorage.setItem("sideNavSelection", sideNavSelection);
     localStorage.setItem("mainContentCalendar", calendar);
+    localStorage.setItem("mainContentMenuBar", menuBar);
 
-    //TODO: make function that runs after load with everything a page might need
-    if (calendar) {
-        $("#mainContent").load(localStorage.getItem("mainContentFile"), makeCalendar);
-    } else {
-        $("#mainContent").load(localStorage.getItem("mainContentFile"));
-    }
+    $("#mainContent").load(localStorage.getItem("mainContentFile"), mainContentLoader);
 
     highlightSelectionSideNav(element);
 }
 
 //Account
 function openMainContent_Account_Summary(element) {
-    openMainContent_master(element, "html/maincontent/account/summary.html", 1, false);
+    openMainContent_master(element, "html/maincontent/account/summary.html", 1, false, false);
 }
 function openMainContent_Account_Balance(element) {
-    openMainContent_master(element, "html/maincontent/account/balance.html", 2, false);
+    openMainContent_master(element, "html/maincontent/account/balance.html", 2, false, false);
 }
 function openMainContent_Account_Settings(element) {
-    openMainContent_master(element, "html/maincontent/account/settings.html", 3, false);
+    openMainContent_master(element, "html/maincontent/account/settings.html", 3, false, false);
 }
 
 //Registration
 function openMainContent_Registration_Status(element) {
-    openMainContent_master(element, "html/maincontent/registration/status.html", 1, false);
+    openMainContent_master(element, "html/maincontent/registration/status.html", 1, false, false);
 }
 function openMainContent_Registration_Schedule(element) {
-    openMainContent_master(element, "html/maincontent/registration/schedule.html", 2, true);
+    openMainContent_master(element, "html/maincontent/registration/schedule.html", 2, true, false);
 }
 function openMainContent_Registration_Classes(element) {
-    openMainContent_master(element, "html/maincontent/registration/classes.html", 3, false);
+    openMainContent_master(element, "html/maincontent/registration/classes.html", 3, false, false);
 }
 
 //Classes
 function openMainContent_Classes_List(element) {
-    openMainContent_master(element, "html/maincontent/classes/list.html", 1, false);
+    openMainContent_master(element, "html/maincontent/classes/list.html", 1, false, false);
 }
 function openMainContent_Classes_Enrollment(element) {
-    openMainContent_master(element, "html/maincontent/classes/enrollment.html", 2, false);
+    openMainContent_master(element, "html/maincontent/classes/enrollment.html", 2, false, false);
 }
 function openMainContent_Classes_Grades(element) {
-    openMainContent_master(element, "html/maincontent/classes/grades.html", 3, false);
+    openMainContent_master(element, "html/maincontent/classes/grades.html", 3, false, false);
 }
 
 //employee
 function openMainContent_Employee_Job(element) {
-    openMainContent_master(element, "html/maincontent/employee/job.html", 1, false);
+    openMainContent_master(element, "html/maincontent/employee/job.html", 1, false, false);
 }
 function openMainContent_Employee_Timesheet(element) {
-    openMainContent_master(element, "html/maincontent/employee/timesheet.html", 2, false);
+    openMainContent_master(element, "html/maincontent/employee/timesheet.html", 2, false, false);
 }
 function openMainContent_Employee_Pay(element) {
-    openMainContent_master(element, "html/maincontent/employee/pay.html", 3, false);
+    openMainContent_master(element, "html/maincontent/employee/pay.html", 3, false, false);
 }
 
 //mockups
 function openMainContent_Mockups_ClassSchedule(element) {
-    openMainContent_master(element, "html/maincontent/mockups/schedule.html", 1, true);
+    openMainContent_master(element, "html/maincontent/mockups/schedule.html", 1, true, true);
 }
 ////////////////////////////
 

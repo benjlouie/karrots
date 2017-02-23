@@ -22,7 +22,8 @@ function startup_localStorage() {
         ["sideNavFile", ""],
         ["sideNavSelection", 1],
         ["mainContentFile", ""],
-        ["mainContentCalendar", false]
+        ["mainContentCalendar", false],
+        ["mainContentMenuBar", false]
     ];
 
     for (var i = 0; i < LSVars.length; i++) {

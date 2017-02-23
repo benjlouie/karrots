@@ -13,6 +13,7 @@
 
 /* all styles within mainContent should start with 'mc_' */
 
+/*Side List*/
 .mc_sideList {
     float: left;
     display: block;
@@ -44,28 +45,168 @@
     cursor: pointer;
 }
 .mc_sideListDetail {
-    font-size: 0;
     opacity: 0;
     max-height: 0px;
 
     transition: 0.2s;
 
-    color: #adada6;
+    color: #babab2;
+    margin: 0;
     padding: 0px;
     white-space: nowrap;
     overflow-x: scroll; /*because lol, horizontal scroll is now a thing*/
+
+    /*Edge scrollbar hiding*/
+    -ms-overflow-style: none;
 }
 .mc_sideListDetail::-webkit-scrollbar {
+    /*chrome scrollbar hiding*/
     display:none;
 }
+
+/*Menu Bar*/
+.mc_menuBar {
+    display: table;
+    width: 100%;
+
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background-color: #5f5f5f;
+}
+
+.mc_dropdown {
+    float: left;
+    top: 0;
+    color: #bdbdbd;
+}
+.mc_dropdown ul {
+    display: block;
+    position: absolute;
+    list-style:none;
+
+    max-height: 200px;
+    overflow-y: scroll;
+
+    padding: 0px;
+    margin: 0px;
+    background-color: #818181;
+    text-decoration: none;
+}
+.mc_dropdownItem a {
+    display: none;
+}
+.mc_dropdownHeader {
+    display: block;
+    background-color: #5f5f5f;
+    border: solid;
+    border-color: black;
+    border-width: 0px 2px 2px 0px;
+    padding: 5px 8px 5px 8px;
+}
+.mc_dropdownHeader {
+    display: block;
+}
+.mc_dropdown:hover .mc_dropdownItem a{
+    display: block;
+}
+.mc_dropdownHeader, .mc_dropdownItem a {
+    text-align: left;
+    text-decoration: none;
+    color: #f1f1f1;
+    white-space:nowrap;
+    padding: 5px 8px 5px 8px;
+}
+.mc_dropdownItem a:hover {
+    background-color: black;
+}
+
 .mc_scheduleCalendar {
     float: left;
     max-height: 60%;
-    width: 75%; /*paired with .mc_selectedClassList*/
+    width: 75%; /*paired with .mc_sideList*/
     border:solid;
     border-width: 0px 0px 2px 0px;
 }
 
+
+
+/*Class Scheduling Specific*/
+/*/////////////////////////*/
+.mc_sideListDetail_class {
+    width: 100%;
+    border-collapse: collapse;
+
+    font-size: 1.25vw; /*close enough*/
+    text-align: center;
+}
+.mc_sideListDetail_class, .mc_sideListDetail_class th, .mc_sideListDetail_class td {
+    border: solid;
+    border-color: #313131;
+    border-width: 1px;
+}
+.mc_sideListDetail_class th {
+    background-color: black;
+}
+
 .mc_classListSection {
     clear: left;
+    height: calc(50% - 43px - 30px); /*50% - topNav height - menuBar height*/
+    background-color: black;
+}
+
+.mc_classList {
+    clear: left;
+
+    color: #babab2;
+    background-color: #5f5f5f;
+}
+.mc_classList table {
+    display: flex;
+    flex-flow: column;
+    width: 100%;
+
+    border-collapse: collapse;
+    border-width: 0px;
+
+    font-size: 1.25vw;
+    text-align: center;
+}
+.mc_classList thead, .mc_classList tbody {
+    flex: 1 1 auto;
+    /*width: calc(100% - 0.9em);*/
+}
+.mc_classList thead {
+    table-layout: fixed;
+    width: 100%;
+}
+.mc_classList tbody {
+    flex: 1 1 auto;
+    display: block;
+    height: 35vh;
+
+    overflow-y: scroll;
+}
+.mc_classList tbody::-webkit-scrollbar {
+    /*chrome scrollbar hiding*/
+    display:none;
+}
+.mc_classList tbody tr {
+    width: 100%;
+}
+.mc_classList thead, .mc_classList tbody tr {
+    display: table;
+    table-layout: fixed;
+}
+
+.mc_classList th, .mc_classList td {
+    border: solid;
+    border-color: #313131;
+    border-width: 1px;
+}
+.mc_classList table {
+    border-width: 0px;
+}
+.mc_classList th {
+    background-color: black;
 }

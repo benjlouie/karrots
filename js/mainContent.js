@@ -8,14 +8,12 @@ function mc_sideListDetailToggle(element) {
     var details = liChildren[1]; //div
     if (details.style.maxHeight == "0px" || details.style.maxHeight == "") {
         details.style.maxHeight = "1000px";
-        details.style.padding = "2px 2px 2px 10px";
+        details.style.padding = "2px 2px 2px 2px";
         details.style.opacity = "1";
-        details.style.fontSize = "initial";
     } else {
         details.style.maxHeight = "0px";
         details.style.padding = "0px";
         details.style.opacity = "0";
-        details.style.fontSize = "0";
     }
 }
 
@@ -28,9 +26,10 @@ function makeCalendar() {
     }
 
     var calendar = $("#calendar");
+    var classList = document.getElementById("mc_selectedClassList");
 
     calendar.fullCalendar({
-
+        height: classList.clientHeight,
         header: false,
 
         views: {
@@ -70,7 +69,6 @@ function makeCalendar() {
 
     //change calendar view to weekly adenda style
     calendar.fullCalendar("changeView", "sevenDaySchedule");
-    adjustCalendarHeight();
 }
 
 function adjustCalendarHeight() {
