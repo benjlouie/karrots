@@ -4,17 +4,23 @@
 
 //takes in the <a> that was clicked and toggles its associated div 
 function mc_sideListDetailToggle(element) {
+    var toggleIcon = element.getElementsByClassName("mc_sideListDetailToggleIcon")[0];
     var liChildren = element.parentNode.children;
     var details = liChildren[1]; //div
+
     if (details.style.maxHeight == "0px" || details.style.maxHeight == "") {
         details.style.maxHeight = "1000px";
         details.style.padding = "2px 2px 2px 2px";
         details.style.opacity = "1";
+        var iconText = document.createTextNode("-");
     } else {
         details.style.maxHeight = "0px";
         details.style.padding = "0px 2px 0px 2px";
         details.style.opacity = "0";
+        var iconText = document.createTextNode("+");
     }
+    toggleIcon.removeChild(toggleIcon.firstChild);
+    toggleIcon.appendChild(iconText);
 }
 
 ////Schedule specific////
@@ -46,6 +52,8 @@ function classListRowClick(element) {
     }
 }
 
+
+////Calendar////
 function makeCalendar() {
     //init calendar
     var calendar = document.getElementById("calendar");
