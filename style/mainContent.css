@@ -26,6 +26,11 @@
     border:solid;
     border-width: 0px 0px 2px 0px;
 }
+.mc_sideListHeader {
+    display: block;
+    text-align:center;
+    font-weight: bolder;
+}
 .mc_sideList ul {
     list-style: none;
     padding: 0;
@@ -71,8 +76,19 @@
     border-width: 0px 0px 2px 0px;
 }
 
+.mc_menuBarItem {
+    float:left;
+
+    border: solid;
+    border-color: black;
+    border-width: 0px 2px 0px 0px;
+}
+.mc_menuBarItem > * {
+    display: block;
+    padding: 5px 8px 5px 8px;
+}
+
 .mc_dropdown {
-    float: left;
     top: 0;
     color: #bdbdbd;
 }
@@ -94,11 +110,8 @@
 }
 .mc_dropdownHeader {
     display: block;
+    font-weight: bolder;
     background-color: #5f5f5f;
-    border: solid;
-    border-color: black;
-    border-width: 0px 2px 0px 0px;
-    padding: 5px 8px 5px 8px;
 }
 .mc_dropdown:hover .mc_dropdownItem a{
     display: block;
@@ -162,6 +175,7 @@
 }
 .mc_classList table {
     width: 100%;
+    margin-bottom: 1em;
     border-collapse: collapse;
     border-width: 0px;
 }
