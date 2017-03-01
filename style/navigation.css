@@ -51,14 +51,7 @@ body {
 /*Navigation top bar*/
 nav {
     border:solid;
-    border-width: 0px 0px 3px 0px;
-}
-.navigation {
-    padding: 0px;
-    margin:auto;
-    border-width: 0px;
-    background-color: #5f5f5f;
-    border-color: #111111;
+    border-width: 0px 0px 2px 0px;
 }
 nav div ul {
     display: table;
@@ -81,6 +74,9 @@ nav div ul li a {
 nav div ul li a:hover {
     text-decoration: none;
 }
+nav div ul li a:focus {
+    background-color: black;
+}
 
 /*Sidenav bar*/
 .sidenav {
@@ -95,7 +91,7 @@ nav div ul li a:hover {
     transition: 0.3s; /*animation time*/
 
     border:solid;
-    border-width: 0px 3px 0px 0px;
+    border-width: 0px 2px 0px 0px;
 
     background-color: #5f5f5f;
 }
@@ -112,6 +108,9 @@ nav div ul li a:hover {
     text-decoration:none;
     background-color: black;
 }
+.sidenav a:focus {
+    background-color: black;
+}
 .sidenav .sidenav_closebtn {
     text-align: right;
     padding: 0px 20px 0px 0px;
@@ -125,10 +124,24 @@ nav div ul li a:hover {
      font-size: 38px;
 }
 
+.navigation {
+    padding: 0px;
+    margin:auto;
+    border-width: 0px;
+    background-color: #5f5f5f;
+    border-color: #111111;
+}
+
 /*navigation links cursor*/
 .navigation a:hover {
     cursor: pointer;
 }
+
+/*nav links that are currently selected*/
+.navActive {
+    background-color: black;
+}
+
 
 .main_icon {
     padding: 0px 0px 0px 0px;
@@ -144,16 +157,4 @@ nav div ul li a:hover {
 
     padding: 0px;
     margin: 0px;
-}
-
-/*main content*/
-.main_content {
-    height:100%;
-    position:fixed;
-    overflow-y: auto;
-    padding-left: 2px;
-}
-
-#mainContent {
-    transition: margin-left 0.3s;
 }

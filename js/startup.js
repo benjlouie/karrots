@@ -6,16 +6,24 @@ window.onload = function () {
     startup_contentCalls();
 };
 
+window.onresize = function () {
+    adjustCalendarHeight();
+}
+
 function startup_localStorage() {
     //array of [LSItem, defaultValue]
     var LSVars = [
-        ["topNavDisplay", "hidden"],
-        ["topNavFile", "html/topnav/student"],
-        ["sideNavDisplay", "hidden_maximized"],
-        ["sideNavFile", "html/sidenav/account.html"],
-        ["mainContentFile", ""],
         ["loginContentFile", "html/login.html"],
-        ["accountType", "none"]
+        ["accountType", "none"],
+        ["topNavDisplay", "hidden"],
+        ["topNavFile", ""],
+        ["topNavSelection", ""],
+        ["sideNavDisplay", "hidden_maximized"],
+        ["sideNavFile", ""],
+        ["sideNavSelection", 1],
+        ["mainContentFile", ""],
+        ["mainContentCalendar", false],
+        ["mainContentMenuBar", false]
     ];
 
     for (var i = 0; i < LSVars.length; i++) {

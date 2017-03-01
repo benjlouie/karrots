@@ -32,6 +32,11 @@ function login() {
     startupMainContent();
 }
 
+function logout() {
+    localStorage.clear();
+    location.reload();
+}
+
 function removeLogin() {
     var loginContent = document.getElementById("loginContent");
     while (loginContent.firstChild) {
@@ -46,24 +51,45 @@ function startupTopNav() {
     var topNavDisplay = localStorage.getItem("topNavDisplay");
     var topNav = document.getElementById("topNav");
     if (topNavDisplay == "hidden") {
-        topNav.style.display = "hidden";
+        topNav.style.display = "none";
     } else if (topNavDisplay == "show") {
         topNav.style.display = "initial";
-        $("#topNav").load(localStorage.getItem("topNavFile"));
+        //highlight correct selection after load
+        $("#topNav").load(localStorage.getItem("topNavFile"), highlightSelectionTopNav);
+    }
+}
+
+//highlights the current topnav element
+function highlightSelectionTopNav() {
+    //clear previous
+    var topNav = document.getElementById("topNav");
+    var ul = topNav.firstElementChild;
+    var lis = ul.children;
+    var topNavSelection = localStorage.getItem("topNavSelection");
+    for (var i = 0; i < lis.length; i++) {
+        //firstChild is <a>
+        var a = lis[i].firstChild;
+        if (a.innerHTML == topNavSelection) {
+            a.className = "navActive";
+        } else {
+            a.className = "";
+        }
     }
 }
 ////////////////////////////
 
 //go back to start page
 function logoClick() {
-    localStorage.setItem("sideNavFile", "html/sidenav/account.html");
+    localStorage.setItem("sideNavFile", "");
     localStorage.setItem("mainContentFile", "html/maincontent/startpage.html");
+    localStorage.setItem("topNavSelection", "");
 
+    highlightSelectionTopNav()
     hideSideNav();
     //open mainContent
     $("#mainContent").load(localStorage.getItem("mainContentFile")); //load maincontent
     var mainContent = document.getElementById("mainContent");
-    mainContent.style.marginLeft = "0px";
+    mainContent.style.left = "0px";
 }
 
 /*sidenav opening/closing*/
@@ -93,49 +119,61 @@ function setSideNavVisible() {
     }
 }
 
-function openSideNavAccount() {
-    localStorage.setItem("sideNavFile", "html/sidenav/account.html");
+function openSideNav_master(sideNavFile, element) {
+    if (localStorage.getItem("sideNavFile") == sideNavFile) {
+        //already loaded, do nothing
+        return;
+    }
+    //different tab, continue
+    localStorage.setItem("sideNavFile", sideNavFile);
+    localStorage.setItem("topNavSelection", element.innerHTML);
+    localStorage.setItem("sideNavSelection", ""); //new tab, no sidenav selection
     setSideNavVisible();
     startupSideNav();
+    highlightSelectionTopNav();
 }
-function openSideNavRegistration() {
-    localStorage.setItem("sideNavFile", "html/sidenav/registration.html");
-    setSideNavVisible();
-    startupSideNav();
+
+function openSideNavAccount(element) {
+    openSideNav_master("html/sidenav/account.html", element);
 }
-function openSideNavClasses() {
-    localStorage.setItem("sideNavFile", "html/sidenav/classes.html");
-    setSideNavVisible();
-    startupSideNav();
+function openSideNavRegistration(element) {
+    openSideNav_master("html/sidenav/registration.html", element);
 }
-function openSideNavEmployee() {
-    localStorage.setItem("sideNavFile", "html/sidenav/employee.html");
-    setSideNavVisible();
-    startupSideNav();
+function openSideNavClasses(element) {
+    openSideNav_master("html/sidenav/classes.html", element);
+}
+function openSideNavEmployee(element) {
+    openSideNav_master("html/sidenav/employee.html", element);
+}
+function openSideNavMockups(element) {
+    openSideNav_master("html/sidenav/mockups.html", element);
 }
 
 function minimizeSideNav() {
     var sideNav = document.getElementById("sideNav");
     sideNav.style.minWidth = "40px";
-    sideNav.style.borderRightWidth = "3px";
+    sideNav.style.borderRightWidth = "2px";
     localStorage.setItem("sideNavDisplay", "minimized");/*save sidenav as minimized*/
 
     //load sidenav, minimize after done loading
-    $("#sideNav").load(localStorage.getItem("sideNavFile"), setSideNavMinimizedContents);
+    $("#sideNav").load(localStorage.getItem("sideNavFile"), function () {
+        setSideNavMinimizedContents();
+        highlightSelectionSideNav();
+    });
 
     var mainContent = document.getElementById("mainContent");
-    mainContent.style.marginLeft = "42px";
+    mainContent.style.left = "42px";
 }
 
 function maximizeSideNav() {
     var sideNav = document.getElementById("sideNav");
     sideNav.style.minWidth = "200px";
-    sideNav.style.borderRightWidth = "3px";
+    sideNav.style.borderRightWidth = "2px";
 
     //load currently selected tab
-    $("#sideNav").load(localStorage.getItem("sideNavFile"));
+    $("#sideNav").load(localStorage.getItem("sideNavFile"), highlightSelectionSideNav);
     var mainContent = document.getElementById("mainContent");
-    mainContent.style.marginLeft = "202px";
+    mainContent.style.left = "202px";
 
     localStorage.setItem("sideNavDisplay", "maximized"); //save sidenav as maximized
 }
@@ -173,6 +211,31 @@ function setMainContentLeftMargin() {
     var mainContent = document.getElementById("mainContent");
     mainContent.style.marginLeft = width + "px";
 }
+
+//highlights the current sidenav element
+function highlightSelectionSideNav(element) {
+    //clear previous
+    var sideNav = document.getElementById("sideNav");
+    var ul = sideNav.firstElementChild;
+    var lis = ul.children;
+    var sideNavSelection = localStorage.getItem("sideNavSelection"); //actually a string, but javascript?
+
+    for (var i = 0; i < lis.length; i++) {
+        //firstChild is <a>
+        var a = lis[i].firstChild;
+        //max/min button, leave alone
+        if (a.className == "sidenav_closebtn" || a.className == "sidenav_maxbtn") {
+            continue;
+        }
+
+        if (i == sideNavSelection) {
+            a.className = "navActive";
+        } else {
+            a.className = "";
+        }
+    }
+
+}
 ////////////////////////////
 
 /*MainContent opening/closing*/
@@ -181,85 +244,97 @@ function startupMainContent() {
     var mainContentFile = localStorage.getItem("mainContentFile");
     if (mainContentFile != "") {
         //there is a file, load it
-        $("#mainContent").load(localStorage.getItem("mainContentFile"));
-        //TODO: add localStorage to know if there is a calendar or not on that page
-        $("#mainContent").ready(makeCalendar); //make calendar if it's there
+        $("#mainContent").load(localStorage.getItem("mainContentFile"), mainContentLoader);
+    } else {
+        //clear main content
+        var mainContent = document.getElementById("mainContent");
+        while (mainContent.firstChild) {
+            mainContent.removeChild(mainContent.firstChild);
+        }
     }
+}
+
+function mainContentLoader() {
+    var mainContentFile = localStorage.getItem("mainContentFile");
+
+    //load calendar after everything else, need these
+    var d1 = new $.Deferred();
+    //var d2 = new $.Deferred();
+    if (localStorage.getItem("mainContentCalendar") == "true") {
+        $.when(d1/*, d2*/).then(function () {
+            makeCalendar();
+        })
+    }
+
+    //menuBar loading
+    if (localStorage.getItem("mainContentMenuBar") == "true") {
+        var splitPos = mainContentFile.length - 5; //string without ending ".html"
+        var menuBarFile = mainContentFile.substr(0, splitPos) + "_menuBar.html";
+        $("#mc_menuBar").load(menuBarFile, function () { d1.resolve(); });
+    } else {
+        d1.resolve();
+    }
+}
+
+//loads in the mainContent
+function openMainContent_master(element, mainContentFile, sideNavSelection, calendar, menuBar) {
+    localStorage.setItem("mainContentFile", mainContentFile);
+    localStorage.setItem("sideNavSelection", sideNavSelection);
+    localStorage.setItem("mainContentCalendar", calendar);
+    localStorage.setItem("mainContentMenuBar", menuBar);
+
+    $("#mainContent").load(localStorage.getItem("mainContentFile"), mainContentLoader);
+
+    highlightSelectionSideNav(element);
 }
 
 //Account
-function openMainContent_Account_Summary() {
-    localStorage.setItem("mainContentFile", "html/maincontent/account/summary.html");
-    $("#mainContent").load(localStorage.getItem("mainContentFile"));
+function openMainContent_Account_Summary(element) {
+    openMainContent_master(element, "html/maincontent/account/summary.html", 1, false, false);
 }
-function openMainContent_Account_Balance() {
-    localStorage.setItem("mainContentFile", "html/maincontent/account/balance.html");
-    $("#mainContent").load(localStorage.getItem("mainContentFile"));
+function openMainContent_Account_Balance(element) {
+    openMainContent_master(element, "html/maincontent/account/balance.html", 2, false, false);
 }
-function openMainContent_Account_Settings() {
-    localStorage.setItem("mainContentFile", "html/maincontent/account/settings.html");
-    $("#mainContent").load(localStorage.getItem("mainContentFile"));
+function openMainContent_Account_Settings(element) {
+    openMainContent_master(element, "html/maincontent/account/settings.html", 3, false, false);
 }
 
 //Registration
-function openMainContent_Registration_Status() {
-    localStorage.setItem("mainContentFile", "html/maincontent/registration/status.html");
-    $("#mainContent").load(localStorage.getItem("mainContentFile"));
+function openMainContent_Registration_Status(element) {
+    openMainContent_master(element, "html/maincontent/registration/status.html", 1, false, false);
 }
-function openMainContent_Registration_Schedule() {
-    localStorage.setItem("mainContentFile", "html/maincontent/registration/schedule.html");
-    $("#mainContent").load(localStorage.getItem("mainContentFile"), makeCalendar);
+function openMainContent_Registration_Schedule(element) {
+    openMainContent_master(element, "html/maincontent/registration/schedule.html", 2, true, false);
 }
-function openMainContent_Registration_Classes() {
-    localStorage.setItem("mainContentFile", "html/maincontent/registration/classes.html");
-    $("#mainContent").load(localStorage.getItem("mainContentFile"));
+function openMainContent_Registration_Classes(element) {
+    openMainContent_master(element, "html/maincontent/registration/classes.html", 3, false, false);
 }
 
 //Classes
-function openMainContent_Classes_List() {
-    localStorage.setItem("mainContentFile", "html/maincontent/classes/list.html");
-    $("#mainContent").load(localStorage.getItem("mainContentFile"));
+function openMainContent_Classes_List(element) {
+    openMainContent_master(element, "html/maincontent/classes/list.html", 1, false, false);
 }
-function openMainContent_Classes_Enrollment() {
-    localStorage.setItem("mainContentFile", "html/maincontent/classes/enrollment.html");
-    $("#mainContent").load(localStorage.getItem("mainContentFile"));
+function openMainContent_Classes_Enrollment(element) {
+    openMainContent_master(element, "html/maincontent/classes/enrollment.html", 2, false, false);
 }
-function openMainContent_Classes_Grades() {
-    localStorage.setItem("mainContentFile", "html/maincontent/classes/grades.html");
-    $("#mainContent").load(localStorage.getItem("mainContentFile"));
+function openMainContent_Classes_Grades(element) {
+    openMainContent_master(element, "html/maincontent/classes/grades.html", 3, false, false);
 }
 
 //employee
-function openMainContent_Employee_Job() {
-    localStorage.setItem("mainContentFile", "html/maincontent/employee/job.html");
-    $("#mainContent").load(localStorage.getItem("mainContentFile"));
+function openMainContent_Employee_Job(element) {
+    openMainContent_master(element, "html/maincontent/employee/job.html", 1, false, false);
 }
-function openMainContent_Employee_Timesheet() {
-    localStorage.setItem("mainContentFile", "html/maincontent/employee/timesheet.html");
-    $("#mainContent").load(localStorage.getItem("mainContentFile"));
+function openMainContent_Employee_Timesheet(element) {
+    openMainContent_master(element, "html/maincontent/employee/timesheet.html", 2, false, false);
 }
-function openMainContent_Employee_Pay() {
-    localStorage.setItem("mainContentFile", "html/maincontent/employee/pay.html");
-    $("#mainContent").load(localStorage.getItem("mainContentFile"));
+function openMainContent_Employee_Pay(element) {
+    openMainContent_master(element, "html/maincontent/employee/pay.html", 3, false, false);
 }
 
-function makeCalendar() {
-    //init calendar
-    var calendar = document.getElementById("calendar");
-    if (!calendar) {
-        //no calendar, stop
-        return;
-    }
-
-    $("#calendar").fullCalendar({
-        //put options and callbacks here
-        dayClick: function () {
-            alert("you clicked a day!");
-        }
-    });
-
-    //change calendar view to weekly adenda style
-    $("#calendar").fullCalendar("changeView", "agendaWeek");
+//mockups
+function openMainContent_Mockups_ClassSchedule(element) {
+    openMainContent_master(element, "html/maincontent/mockups/schedule.html", 1, true, true);
 }
 ////////////////////////////
 

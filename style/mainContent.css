@@ -1,0 +1,268 @@
+﻿/*main content*/
+.main_content {
+    left: 0;
+    height:100%;
+    position:fixed;
+    overflow-y: auto;
+    /*padding-left: 2px;*/
+}
+
+#mainContent {
+    transition: left 0.3s;
+}
+
+/* all styles within mainContent should start with 'mc_' */
+
+/*Side List*/
+.mc_sideList {
+    float: left;
+    display: block;
+
+    position: relative;
+    min-height: 55%;
+    max-height: 55%;
+    width: 25%; /*paired with .mc_scheduleCalendar*/
+    height: auto;
+
+    overflow-y: scroll;
+
+    background-color: #5f5f5f;
+    border:solid;
+    border-width: 0px 0px 2px 0px;
+}
+.mc_sideList ul {
+    list-style: none;
+    padding: 0;
+}
+.mc_sideList a {
+    display: block;
+    color: #f1f1f1;
+    white-space: nowrap; /*TODO: change? what if list gets too small?*/
+    padding: 2px 2px 2px 2px;
+}
+.mc_sideList a:hover {
+    background-color: black;
+    cursor: pointer;
+}
+.mc_sideListDetail {
+    max-height: 0px;
+    opacity: 0;
+
+    transition: 0.2s;
+
+    color: #babab2;
+    margin: 0;
+    padding: 0px 2px 0px 2px;
+    white-space: nowrap;
+    overflow-x: scroll; /*because lol, horizontal scroll is now a thing*/
+
+    /*Edge scrollbar hiding*/
+    -ms-overflow-style: none;
+}
+.mc_sideListDetail::-webkit-scrollbar {
+    /*chrome scrollbar hiding*/
+    display:none;
+}
+
+/*Menu Bar*/
+.mc_menuBar {
+    display: table;
+    width: 100%;
+
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background-color: #5f5f5f;
+
+    border: solid;
+    border-color: black;
+    border-width: 0px 0px 2px 0px;
+}
+
+.mc_dropdown {
+    float: left;
+    top: 0;
+    color: #bdbdbd;
+}
+.mc_dropdown ul {
+    display: block;
+    position: absolute;
+    list-style:none;
+
+    max-height: 200px;
+    overflow-y: scroll;
+
+    padding: 0px;
+    margin: 0px;
+    background-color: #818181;
+    text-decoration: none;
+}
+.mc_dropdownItem a {
+    display: none;
+}
+.mc_dropdownHeader {
+    display: block;
+    background-color: #5f5f5f;
+    border: solid;
+    border-color: black;
+    border-width: 0px 2px 0px 0px;
+    padding: 5px 8px 5px 8px;
+}
+.mc_dropdown:hover .mc_dropdownItem a{
+    display: block;
+}
+.mc_dropdownHeader, .mc_dropdownItem a {
+    text-align: left;
+    text-decoration: none;
+    color: #f1f1f1;
+    white-space:nowrap;
+    padding: 5px 8px 5px 8px;
+}
+.mc_dropdownItem a:hover {
+    background-color: black;
+}
+
+.mc_scheduleCalendar {
+    float: left;
+    max-height: 60%;
+    width: 75%; /*paired with .mc_sideList*/
+    border:solid;
+    border-width: 0px 0px 2px 0px;
+}
+
+
+
+/*Class Scheduling Specific*/
+/*/////////////////////////*/
+.mc_sideListDetail_class {
+    width: 100%;
+    border-collapse: collapse;
+
+    font-size: 1.25vw; /*close enough*/
+    text-align: center;
+}
+.mc_sideListDetail_class, .mc_sideListDetail_class th, .mc_sideListDetail_class td {
+    border: solid;
+    border-color: #313131;
+    border-width: 1px;
+}
+.mc_sideListDetail_class th {
+    background-color: black;
+}
+
+.mc_classListMenu {
+    clear: left;
+}
+.mc_classListSection {
+    height: calc(50% - 43px - 30px - 30px); /*50% - topNav height - menuBar height - */
+    background-color: black;
+}
+
+.mc_classList {
+    clear: left;
+
+    color: #c4c4bc;
+    background-color: #5f5f5f;
+}
+
+.mc_classListSection {
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+.mc_classList table {
+    width: 100%;
+    border-collapse: collapse;
+    border-width: 0px;
+}
+.mc_classList tbody {
+    overflow-y: scroll;
+}
+
+.mc_classList td {
+    height: 0px; /*hack to work with add/remove button*/
+
+    border: solid;
+    border-color: black;
+    border-width: 1px;
+    padding: 1px 2px 1px 2px;
+}
+.mc_classList td:first-child {
+    border-left-width: 0px;
+}
+.mc_classList td:last-child {
+    border-right-width: 0px;
+}
+
+.mc_classList tbody tr:hover td:not(:first-child) {
+    background-color: black;
+    cursor: default;
+}
+
+.mc_classList td:first-child {
+    padding: 0px 0px 0px 0px;
+}
+.mc_classList_addRemoveSwitch {
+    cursor: pointer;
+    text-align: center;
+    border: solid;
+    border-color: black;
+    border-width: 1px;
+}
+.mc_classListDetail {
+    display: none;
+    background-color: #8f8f8f;
+    color: black;
+}
+.mc_classListDetail td div {
+    padding: 0px 2px 0px 2px;
+}
+
+/*
+.mc_classList table {
+    display: flex;
+    flex-flow: column;
+    width: 100%;
+
+    border-collapse: collapse;
+    border-width: 0px;
+
+    font-size: 1.25vw;
+    text-align: center;
+}
+.mc_classList thead, .mc_classList tbody {
+    flex: 1 1 auto;
+}
+.mc_classList thead {
+    table-layout: fixed;
+    width: 100%;
+}
+.mc_classList tbody {
+    flex: 1 1 auto;
+    display: block;
+    height: 35vh;
+
+    overflow-y: scroll;
+}
+.mc_classList tbody::-webkit-scrollbar {
+    display:none;
+}
+.mc_classList tbody tr {
+    width: 100%;
+}
+.mc_classList thead, .mc_classList tbody tr {
+    display: table;
+    table-layout: fixed;
+}
+
+.mc_classList th, .mc_classList td {
+    border: solid;
+    border-color: #313131;
+    border-width: 1px;
+}
+.mc_classList table {
+    border-width: 0px;
+}
+.mc_classList th {
+    background-color: black;
+}
+    */
