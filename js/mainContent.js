@@ -12,8 +12,37 @@ function mc_sideListDetailToggle(element) {
         details.style.opacity = "1";
     } else {
         details.style.maxHeight = "0px";
-        details.style.padding = "0px";
+        details.style.padding = "0px 2px 0px 2px";
         details.style.opacity = "0";
+    }
+}
+
+////Schedule specific////
+function classListSwitch(element) {
+    event.cancelBubble = true;
+    if (event.stopPropagation) {
+        //ensure only add/remove switch is affected
+        event.stopPropagation();
+    }
+
+    if (element.innerHTML == "Add") {
+        element.innerHTML = "Remove";
+        element.style.backgroundColor = "#74dd8f";
+        element.style.color = "black";
+    } else {
+        element.innerHTML = "Add";
+        element.style.backgroundColor = "#5f5f5f";
+        element.style.color = "#babab2";
+    }
+}
+
+function classListRowClick(element) {
+    if (element.nextElementSibling.style.display == "none" || element.nextElementSibling.style.display == "") {
+        element.firstElementChild.rowSpan = 2; //add button takes up both rows
+        element.nextElementSibling.style.display = "table-row";
+    } else {
+        element.firstElementChild.rowSpan = 1; //add button takes up both rows
+        element.nextElementSibling.style.display = "none";
     }
 }
 
@@ -30,12 +59,14 @@ function makeCalendar() {
     calendar.fullCalendar({
         height: 500, //TODO: find a way to make this better
         header: false,
+        defaultDate: "2017-02-21",
 
         views: {
             sevenDaySchedule: {
                 type: 'agenda',
                 duration: { days: 7 },
-                allDaySlot: false
+                allDaySlot: false,
+                columnFormat: 'ddd' //just show day names
             }
         },
 
