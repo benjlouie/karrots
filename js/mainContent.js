@@ -8,19 +8,15 @@ function mc_sideListDetailToggle(element) {
     var liChildren = element.parentNode.children;
     var details = liChildren[1]; //div
 
-    if (details.style.maxHeight == "0px" || details.style.maxHeight == "") {
-        details.style.maxHeight = "1000px";
-        details.style.padding = "2px 2px 2px 2px";
-        details.style.opacity = "1";
+    if (toggleIcon.innerHTML == "+") {
         var iconText = document.createTextNode("-");
     } else {
-        details.style.maxHeight = "0px";
-        details.style.padding = "0px 2px 0px 2px";
-        details.style.opacity = "0";
         var iconText = document.createTextNode("+");
     }
     toggleIcon.removeChild(toggleIcon.firstChild);
     toggleIcon.appendChild(iconText);
+    $(details).slideToggle(150);
+
 }
 
 ////Schedule specific////
@@ -65,9 +61,10 @@ function makeCalendar() {
     var calendar = $("#calendar");
 
     calendar.fullCalendar({
-        height: 500, //TODO: find a way to make this better
+        height: 500, //TODO: call a function first and set height to its result
         header: false,
         defaultDate: "2017-02-21",
+        defaultView: "sevenDaySchedule",
 
         views: {
             sevenDaySchedule: {
@@ -88,25 +85,43 @@ function makeCalendar() {
                 editable: true,
             },
             {
-                title: 'Chemistry',
+                title: 'CSE 222L',
                 start: '2017-02-22 10:30:00',
                 end: '2017-02-22 12:45:00',
                 color: '#5f5f5f',
                 borderColor: 'black',
                 editable: true,
             },
+            {
+                title: 'CSE 113',
+                start: '09:00:00',
+                end: '10:15:00',
+                dow: [1,3,5], //repeat on monday, wednesday, and friday
+
+                color: '#5f5f5f',
+                //color: '#cc0000', //red
+                borderColor: 'black',
+                editable: true,
+            },
         ],
-        //eventDurationEditable: false,
+        //eventDurationEditable: false, //can't move events
         snapDuration: '00:15:00', //edditable duration snaps to 15 min
 
         //put options and callbacks here
         dayClick: function () {
             //alert("you clicked a day!");
-        }
+        },
+
+        //when an event is changed, alter its color
+        eventDrop: function (event, delta, revertFunc, jsEvent, ui, view) {
+            handleOverlaps();
+        },
+        eventResize: function (event, delta, revertFunc, jsEvent, ui, view) {
+            handleOverlaps();
+        },
     });
 
-    //change calendar view to weekly adenda style
-    calendar.fullCalendar("changeView", "sevenDaySchedule");
+    //make sure calendar is the correct height
     adjustCalendarHeight();
 }
 
@@ -114,11 +129,97 @@ function adjustCalendarHeight() {
     if (localStorage.getItem("mainContentCalendar") == "true") {
 
         //mockup_classSchedule
-        var classList = document.getElementById("mc_selectedClassList");
-        if (classList != null) {
-            $('#calendar').fullCalendar('option', 'height', classList.clientHeight);
+        var scheduleCalendar = document.getElementsByClassName("mc_scheduleCalendar");
+        if (scheduleCalendar.length > 0) {
+            $('#calendar').fullCalendar('option', 'height', scheduleCalendar[0].clientHeight);
+        }
+        
+        //mockup_manageClasses
+        var manageClassCalendar = document.getElementsByClassName("mc_manageClassesCalendar");
+        if (manageClassCalendar.length > 0) {
+            $('#calendar').fullCalendar('option', 'height', manageClassCalendar[0].clientHeight);
         }
 
         //TODO: adjust for calendars on other pages
     }
+}
+
+function handleOverlaps() {
+    if (localStorage.getItem("mainContentCalendarEventOverlap") == "true") {
+        //overlap is allowed, don't need to do anything
+        return;
+    }
+
+    var overlappingEvents = getOverlappingEvents();
+    var len = overlappingEvents.length;
+    var overlapTable = {};
+
+    //get hashtable of events that overlap
+    for (var i = 0; i < len; i++) {
+        var event1 = overlappingEvents[i][0];
+        var event2 = overlappingEvents[i][1];
+
+        //using _id covers ALL repeated event times
+        //ex: event on Tues,Fri that only has overlap on friday
+        //    both times will be covered
+        overlapTable[event1._id] = true;
+        overlapTable[event2._id] = true;
+    }
+
+    var allEvents = $('#calendar').fullCalendar('clientEvents');
+    len = allEvents.length;
+    for (var i = 0; i < len; i++) {
+        var event = allEvents[i];
+        if (event._id in overlapTable) {
+            //event overlaps something, set accordingly
+            event.color = "#cc0000";
+        } else {
+            //event does NOT overlap anything, it's good
+            event.color = "#5f5f5f";
+        }
+    }
+}
+
+//returns every pair of overlapping events
+//ex: [[e1,e2],[e3,e4]]
+function getOverlappingEvents() {
+    var overlappingEvents = [];
+    var allEvents = $('#calendar').fullCalendar('clientEvents');
+    var len = allEvents.length;
+
+    if (len == 0) {
+        return numOverlaps;
+    }
+
+    //sort by start time
+    allEvents.sort(function (a, b) {
+        return a.start._d.getTime() > b.start._d.getTime();
+    });
+
+    var prev = allEvents[0];
+    var low = prev.start._d.getTime();
+    var high = prev.end._d.getTime();
+    for (var i = 1; i < len; i++) {
+        var cur = allEvents[i];
+        curStart = cur.start._d.getTime();
+        curEnd = cur.end._d.getTime();
+
+        //check for overlap
+        if (curStart < high) {
+            //overlap
+            prev.color = "";
+            cur.color = "";
+            //push overlapping pair
+            overlappingEvents.push([prev,cur]);
+        }
+
+        //adjust low/high for comparing against next event
+        low = curStart;
+        if (curEnd > high) {
+            high = curEnd;
+            prev = cur; //ensures overlap pair with furthest overlap
+        }
+    }
+
+    return overlappingEvents;
 }

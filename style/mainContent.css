@@ -17,7 +17,6 @@
     float: left;
     display: block;
 
-    /*position: relative;*/
     height: auto;
 
     overflow-y: scroll;
@@ -46,11 +45,10 @@
     cursor: pointer;
 }
 .mc_sideListDetail {
-    opacity: 0;
-    max-height: 0px;
+    display: none;
 
-    transition: 0.2s;
-    overflow: hidden; /*VERY IMPORTANT, keeps details underneath other list items */
+    /*not needed since Using jquery to expand stuff*/
+    /*overflow: hidden;*/ /*VERY IMPORTANT, keeps details underneath other list items */
 
     color: #babab2;
     margin: 0;
@@ -91,6 +89,9 @@
 .mc_dropdown {
     top: 0;
     color: #bdbdbd;
+}
+.mc_dropdown * {
+    z-index: 999; /*dropdown contents always on top*/
 }
 .mc_dropdown ul {
     display: block;
@@ -155,7 +156,7 @@
 
 .mc_scheduleCalendar {
     float: left;
-    max-height: 55%;
+    height: 55%;
     width: 75%; /*paired with .mc_sideList*/
     border:solid;
     border-width: 0px 0px 2px 0px;
@@ -220,4 +221,29 @@
 }
 .mc_classListDetail td div {
     padding: 0px 2px 0px 2px;
+}
+
+
+
+/*Add/Remove Classes Specific*/
+/*/////////////////////////*/
+.mc_manageClassesCalendar {
+    height: 60%;
+    width: 100%;
+
+    border:solid;
+    border-color: black;
+    border-width: 0px 0px 2px 0px;
+}
+
+.mc_manageClasses_menu {
+    height: calc(40% - 2px - 33px); /* mc_manageClassesCalendar - calendar border - menuBar*/
+    width: 50%;
+
+    overflow-y: scroll;
+}
+
+.mc_manageClasses_menuItem {
+    display: inline-block;
+    vertical-align: top;
 }

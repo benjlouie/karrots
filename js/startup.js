@@ -23,6 +23,7 @@ function startup_localStorage() {
         ["sideNavSelection", 1],
         ["mainContentFile", ""],
         ["mainContentCalendar", false],
+        ["mainContentCalendarEventOverlap", false],
         ["mainContentMenuBar", false]
     ];
 
