@@ -38,42 +38,73 @@
             <input type="text" placeholder="ex: 203A" />
         </div>
 
-
         <div class="mc_manageClasses_menuItem">
-            Times list
-        </div>
-        <div class="mc_manageClasses_menuItem">
-            <div class="mc_manageClasses_menuItem">
-                Start Time <br />
-                <input type="time" placeholder="start time" />
-            </div>
-            <div class="mc_manageClasses_menuItem">
-                End Time <br />
-                <input type="time" placeholder="end time" />
+            <div>
+                <div class="mc_manageClasses_menuItem_time">
+                    Start Time <br />
+                    <input type="time" placeholder="start time" />
+                </div>
+                <div class="mc_manageClasses_menuItem_time">
+                    End Time <br />
+                    <input type="time" placeholder="end time" />
+                </div>
             </div>
             <div>
-                <div class="mc_manageClasses_menuItem">
-                    M<br />
-                    <input type="checkbox" placeholder="M" />
+                <div class="mc_manageClasses_menuItem_dayBoxes">
+                    <div class="mc_manageClasses_menuItem_checkbox">
+                        M<br />
+                        <input type="checkbox" placeholder="M" />
+                    </div>
+                    <div class="mc_manageClasses_menuItem_checkbox">
+                        T<br />
+                        <input type="checkbox" placeholder="T" />
+                    </div>
+                    <div class="mc_manageClasses_menuItem_checkbox">
+                        W<br />
+                        <input type="checkbox" placeholder="W" />
+                    </div>
+                    <div class="mc_manageClasses_menuItem_checkbox">
+                        R<br />
+                        <input type="checkbox" placeholder="R" />
+                    </div>
+                    <div class="mc_manageClasses_menuItem_checkbox">
+                        F<br />
+                        <input type="checkbox" placeholder="F" />
+                    </div>
                 </div>
-                <div class="mc_manageClasses_menuItem">
-                    T<br />
-                    <input type="checkbox" placeholder="T" />
+                <div class="mc_manageClasses_menuItem_addTimeBtn">
+                    <button type="button">Add Time</button>
                 </div>
-                <div class="mc_manageClasses_menuItem">
-                    W<br />
-                    <input type="checkbox" placeholder="W" />
-                </div>
-                <div class="mc_manageClasses_menuItem">
-                    R<br />
-                    <input type="checkbox" placeholder="R" />
-                </div>
-                <div class="mc_manageClasses_menuItem">
-                    F<br />
-                    <input type="checkbox" placeholder="F" />
-                </div>
-                <button type="button">Add Time</button>
             </div>
+        </div>
+
+        <div class="mc_manageClasses_menuItem_timesList">
+            <a class="mc_manageClasses_menuItem_timesList_header">Times list</a>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Days</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>11:15am</td>
+                        <td>12:30pm</td>
+                        <td>M R F</td>
+                    </tr>
+
+                    <tr><td>11:15am</td><td>12:30pm</td><td>M R F</td></tr>
+                    <tr><td>11:15am</td><td>12:30pm</td><td>M R F</td></tr>
+                    <tr><td>11:15am</td><td>12:30pm</td><td>M R F</td></tr>
+                    <tr><td>11:15am</td><td>12:30pm</td><td>M R F</td></tr>
+                    <tr><td>11:15am</td><td>12:30pm</td><td>M R F</td></tr>
+                    <tr><td>11:15am</td><td>12:30pm</td><td>M R F</td></tr>
+                    <tr><td>11:15am</td><td>12:30pm</td><td>M R F</td></tr>
+                    <tr><td>11:15am</td><td>12:30pm</td><td>M R F</td></tr>
+                </tbody>
+            </table>
         </div>
 </form>
 </div>

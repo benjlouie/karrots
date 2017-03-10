@@ -10,19 +10,27 @@
     transition: left 0.3s;
 }
 
+/*calendar overrides*/
+.calendarEvent_moreBorder {
+    border-width: 2px !important;
+}
+
 /* all styles within mainContent should start with 'mc_' */
+
+.mc_float_clear {
+    display: block;
+    clear: both;
+}
+
 
 /*Side List*/
 .mc_sideList {
     float: left;
     display: block;
-
     height: auto;
-
     overflow-y: scroll;
-
     background-color: #5f5f5f;
-    border:solid;
+    border: solid;
     border-width: 0px 0px 2px 0px;
 }
 .mc_sideListHeader {
@@ -216,7 +224,7 @@
 }
 .mc_classListDetail {
     display: none;
-    background-color: #8f8f8f;
+    background-color: #990000; /*red, shows conflicts*/
     color: black;
 }
 .mc_classListDetail td div {
@@ -239,11 +247,78 @@
 .mc_manageClasses_menu {
     height: calc(40% - 2px - 33px); /* mc_manageClassesCalendar - calendar border - menuBar*/
     width: 50%;
-
-    overflow-y: scroll;
+    overflow-y: auto;
 }
-
+.mc_manageClasses_halfMenuItem {
+    display: inline-block;
+    vertical-align: top;
+    width: 49%;
+}
 .mc_manageClasses_menuItem {
     display: inline-block;
     vertical-align: top;
+    width: 49%;
+}
+.mc_manageClasses_menuItem > input {
+    width: 100%;
+}
+.mc_manageClasses_menuItem_time {
+    display: inline-block;
+    vertical-align: top;
+    justify-content: space-between;
+}
+.mc_manageClasses_menuItem_time > input {
+    text-align: center;
+}
+.mc_manageClasses_menuItem_dayBoxes {
+    display: inline-block;
+}
+.mc_manageClasses_menuItem_checkbox {
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
+}
+.mc_manageClasses_menuItem_checkbox > input {
+    width: 20px;
+    height: 20px;
+    margin: 0px;
+    padding: 0px;
+}
+.mc_manageClasses_menuItem_addTimeBtn {
+    display: inline-block;
+    width: 50%;
+}
+.mc_manageClasses_menuItem_addTimeBtn > button {
+    width: 100%;
+}
+.mc_manageClasses_menuItem_timesList {
+    display: inline-block;
+    width: 100%;
+    height: calc(0.25 * (40vw - 31px - 43px)); /*25% of what is not taken by calendar - menuBar - topNav*/
+    overflow-y: scroll;
+}
+.mc_manageClasses_menuItem_timesList_header {
+    position: absolute;
+    margin-top: -1em;
+
+}
+.mc_manageClasses_menuItem_timesList table {
+    width: 100%;
+    background-color: #5f5f5f;
+    color: #c4c4bc;
+
+    text-align: center;
+
+    border-collapse: collapse;
+}
+.mc_manageClasses_menuItem_timesList tbody td {
+    border: solid;
+    border-color: black;
+    border-width: 1px;
+}
+.mc_manageClasses_menuItem_timesList tbody td:first-child {
+    border-left-width: 0px;
+}
+.mc_manageClasses_menuItem_timesList tbody td:last-child {
+    border-right-width: 0px;
 }

@@ -39,12 +39,20 @@ function classListSwitch(element) {
 }
 
 function classListRowClick(element) {
-    if (element.nextElementSibling.style.display == "none" || element.nextElementSibling.style.display == "") {
-        element.firstElementChild.rowSpan = 2; //add button takes up both rows
-        element.nextElementSibling.style.display = "table-row";
+    var detailRow = element.nextElementSibling;
+    var detailContents = detailRow.firstElementChild.firstElementChild;
+    var addRemoveBtn = element.firstElementChild;
+
+    if (detailContents == null) {
+        //nothing there so do nothing for now
+        return;
+    }
+    if (detailRow.style.display == "none" || detailRow.style.display == "") {
+        addRemoveBtn.rowSpan = 2; //add button takes up both rows
+        detailRow.style.display = "table-row";
     } else {
-        element.firstElementChild.rowSpan = 1; //add button takes up both rows
-        element.nextElementSibling.style.display = "none";
+        addRemoveBtn.rowSpan = 1; //add button takes up both rows
+        detailRow.style.display = "none";
     }
 }
 
@@ -82,7 +90,9 @@ function makeCalendar() {
                 end: '2017-02-21 08:45:00',
                 color: '#5f5f5f',
                 borderColor: 'black',
+                textColor: 'black',
                 editable: true,
+                className: "calendarEvent_moreBorder", //add css class to change options
             },
             {
                 title: 'CSE 222L',
@@ -90,7 +100,9 @@ function makeCalendar() {
                 end: '2017-02-22 12:45:00',
                 color: '#5f5f5f',
                 borderColor: 'black',
+                textColor: 'black',
                 editable: true,
+                className: "calendarEvent_moreBorder",
             },
             {
                 title: 'CSE 113',
@@ -99,17 +111,28 @@ function makeCalendar() {
                 dow: [1,3,5], //repeat on monday, wednesday, and friday
 
                 color: '#5f5f5f',
-                //color: '#cc0000', //red
                 borderColor: 'black',
+                textColor: 'black',
                 editable: true,
+                className: "calendarEvent_moreBorder",
             },
         ],
         //eventDurationEditable: false, //can't move events
         snapDuration: '00:15:00', //edditable duration snaps to 15 min
 
         //put options and callbacks here
-        dayClick: function () {
-            //alert("you clicked a day!");
+        eventClick: function (event, jsEvent, view) {
+            //change border color when selected
+            var events = $('#calendar').fullCalendar('clientEvents')
+            for (var i = 0; i < events.length; i++) {
+                if (events[i]._id == event._id) {
+                    events[i].borderColor = "#e6e600";//light yellow
+                } else {
+                    events[i].borderColor = "black";
+                }
+            }
+
+            $('#calendar').fullCalendar("rerenderEvents");
         },
 
         //when an event is changed, alter its color
@@ -172,7 +195,7 @@ function handleOverlaps() {
         var event = allEvents[i];
         if (event._id in overlapTable) {
             //event overlaps something, set accordingly
-            event.color = "#cc0000";
+            event.color = "#990000"; //red
         } else {
             //event does NOT overlap anything, it's good
             event.color = "#5f5f5f";
@@ -182,6 +205,7 @@ function handleOverlaps() {
 
 //returns every pair of overlapping events
 //ex: [[e1,e2],[e3,e4]]
+//doesn't get every pair, but each overlapped event will apear at least once
 function getOverlappingEvents() {
     var overlappingEvents = [];
     var allEvents = $('#calendar').fullCalendar('clientEvents');
@@ -193,7 +217,7 @@ function getOverlappingEvents() {
 
     //sort by start time
     allEvents.sort(function (a, b) {
-        return a.start._d.getTime() > b.start._d.getTime();
+        return a.start._d.getTime() - b.start._d.getTime();
     });
 
     var prev = allEvents[0];
