@@ -130,10 +130,21 @@ function manageClasses_timeListRemove(element) {
 
     tbody.removeChild(tr);
 
+    //TODO: check if event is selected already, if yes, remove that calendar event too
+    //remove time/classTime from global kClasses as well
     return;
 }
 
 function manageClasses_addClass() {
+    var dayAbbrev = {
+        U: 0,
+        M: 1,
+        T: 2,
+        W: 3,
+        R: 4,
+        F: 5,
+        S: 6
+    };
     var crn = document.getElementById("mc_manageClasses_input_crn");
     var title = document.getElementById("mc_manageClasses_input_title");
     var course = document.getElementById("mc_manageClasses_input_course");
@@ -202,10 +213,54 @@ function manageClasses_addClass() {
         return;
     }
 
-    //TODO: add class to list of classes
+    //add events to calendar (1 for each time)
+    var events = [];
+    var classTimes = [];
+    var classDays = [];
+    for (var i = 0; i < times.length; i++) {
+        var timeData = times[i].children;
+        var startTime = timeData[0].innerHTML;
+        var endTime = timeData[1].innerHTML;
+        //get days
+        var eventDays = [];
+        var days = timeData[2].innerHTML;
+        days = days.split(" ");
+        for (var d = 0; d < days.length; d++) {
+            eventDays.push(dayAbbrev[days[d]]);
+        }
 
-    //add event to calendar
+        classTimes.push([startTime, endTime]);
+        classDays.push(eventDays);
 
+        events[i] = {
+            id: crn.value + "_" + i,
+            title: course.value,
+            start: time_meridianTo24(startTime),
+            end: time_meridianTo24(endTime),
+            dow: eventDays,
+            color: '#5f5f5f',
+            borderColor: 'black',
+            textColor: 'black',
+            editable: true,
+            className: "calendarEvent_moreBorder",
+        };
+    }
+
+    //add class to global list of classes
+    var newClass = {
+        title: title.value,
+        course: course.value,
+        hrs: hrs.value,
+        seats: seats.value,
+        building: building.value,
+        room: room.value,
+        times: classTimes, //times: [start, end]
+        days: classDays, //days for each time section
+    };
+    kClasses[crn.value] = newClass;
+
+    //render events on calendar
+    $("#calendar").fullCalendar('renderEvents', events);
 }
 
 function manageClasses_updateClass() {
@@ -213,7 +268,123 @@ function manageClasses_updateClass() {
 }
 
 function manageClasses_clearSelection() {
+    var crn = document.getElementById("mc_manageClasses_input_crn");
+    var title = document.getElementById("mc_manageClasses_input_title");
+    var course = document.getElementById("mc_manageClasses_input_course");
+    var hrs = document.getElementById("mc_manageClasses_input_hrs");
+    var seats = document.getElementById("mc_manageClasses_input_seats");
+    var building = document.getElementById("mc_manageClasses_input_building");
+    var room = document.getElementById("mc_manageClasses_input_room");
+    var timesListBody = document.getElementById("mc_manageClasses_timesList");
 
+    //clear data from input area
+    crn.value = "";
+    title.value = "";
+    course.value = "";
+    hrs.value = "";
+    seats.value = "";
+    building.value = "";
+    room.value = "";
+    while (timesListBody.firstChild) {
+        timesListBody.removeChild(timesListBody.firstChild);
+    }
+
+    //deselect classes in calendar
+    var calendar = $('#calendar');
+    var events = calendar.fullCalendar('clientEvents')
+    for (var i = 0; i < events.length; i++) {
+        events[i].borderColor = "black";
+    }
+    calendar.fullCalendar("rerenderEvents");
+
+    //change selection buttons
+    var addClassBtn = document.getElementById("mc_manageClasses_addClassBtn");
+    var updateClassBtn = document.getElementById("mc_manageClasses_updateClassBtn");
+    var clearSelectionBtn = document.getElementById("mc_manageClasses_clearSelectionBtn");
+    addClassBtn.disabled = false;
+    addClassBtn.style.opacity = 1;
+    updateClassBtn.disabled = true;
+    updateClassBtn.style.opacity = 0.4;
+    clearSelectionBtn.disabled = true;
+    clearSelectionBtn.style.opacity = 0.4;
+}
+
+function manageClasses_previewSelected(events) {
+    if (events.length == 0) {
+        return;
+    }
+    var dayAbbrev = {
+        0: 'U',
+        1: 'M',
+        2: 'T',
+        3: 'W',
+        4: 'R',
+        5: 'F',
+        6: 'S'
+    };
+    var crn = document.getElementById("mc_manageClasses_input_crn");
+    var title = document.getElementById("mc_manageClasses_input_title");
+    var course = document.getElementById("mc_manageClasses_input_course");
+    var hrs = document.getElementById("mc_manageClasses_input_hrs");
+    var seats = document.getElementById("mc_manageClasses_input_seats");
+    var building = document.getElementById("mc_manageClasses_input_building");
+    var room = document.getElementById("mc_manageClasses_input_room");
+
+    //put the selected class into the form
+    //fill form from event.title, times by event._id
+    var eventCrn = events[0]._id.split("_")[0]; //_id is #####_#, we just want the front part
+    localStorage.setItem("mainContentCalendarRemoveCrn", eventCrn);
+    //get class data from global
+    var classData = kClasses[eventCrn];
+    crn.value = eventCrn;
+    title.value = classData.title;
+    course.value = classData.course;
+    hrs.value = classData.hrs;
+    seats.value = classData.seats;
+    building.value = classData.building;
+    room.value = classData.room;
+
+    var classTimes = classData.times;
+    var classDays = classData.days;
+    var timesListBody = document.getElementById("mc_manageClasses_timesList");
+    //clear timesList first
+    while (timesListBody.firstChild) {
+        timesListBody.removeChild(timesListBody.firstChild);
+    }
+
+    for (var i = 0; i < classTimes.length; i++) {
+        var startTime = classTimes[i][0];
+        var endTime = classTimes[i][1];
+        var days = classDays[i];
+        var dayString = "";
+        for (var d = 0; d < days.length; d++) {
+            dayString += dayAbbrev[days[d]] + " ";
+        }
+        dayString = dayString.substr(0, dayString.length - 1); //remove final ' '
+
+        //make new node
+        var timeEntry = document.createElement("tr");
+        //startTime
+        var td = document.createElement("td");
+        td.appendChild(document.createTextNode(time_24ToMeridian(startTime)));
+        timeEntry.appendChild(td);
+        //endTime
+        td = document.createElement("td");
+        td.appendChild(document.createTextNode(time_24ToMeridian(endTime)));
+        timeEntry.appendChild(td);
+        //days
+        td = document.createElement("td");
+        td.appendChild(document.createTextNode(dayString));
+        timeEntry.appendChild(td);
+        //remove clickable
+        td = document.createElement("td");
+        td.appendChild(document.createTextNode("Remove"));
+        td.onclick = function () { manageClasses_timeListRemove(this) }; //needed lambda for function arg
+        timeEntry.appendChild(td);
+
+        //append to timesList
+        timesListBody.appendChild(timeEntry);
+    }
 }
 
 ////Calendar////
@@ -242,71 +413,106 @@ function makeCalendar() {
             }
         },
 
-        events: [
-            {
-                title: 'CSE 221',
-                start: '07:30',
-                end: '08:45',
-                dow: [2],
-                color: '#5f5f5f',
-                borderColor: 'black',
-                textColor: 'black',
-                editable: true,
-                className: "calendarEvent_moreBorder", //add css class to change options
-            },
-            {
-                title: 'CSE 222L',
-                start: '10:30',
-                end: '12:45',
-                dow: [3],
-                color: '#5f5f5f',
-                borderColor: 'black',
-                textColor: 'black',
-                editable: true,
-                className: "calendarEvent_moreBorder",
-            },
-            {
-                title: 'CSE 113',
-                start: '09:00',
-                end: '10:15',
-                dow: [1,3,5], //repeat on monday, wednesday, and friday
-
-                color: '#5f5f5f',
-                borderColor: 'black',
-                textColor: 'black',
-                editable: true,
-                className: "calendarEvent_moreBorder",
-            },
-        ],
         //eventDurationEditable: false, //can't move events
         snapDuration: '00:15:00', //edditable duration snaps to 15 min
 
         //put options and callbacks here
         eventClick: function (event, jsEvent, view) {
-            //change border color when selected
-            var events = $('#calendar').fullCalendar('clientEvents')
-            for (var i = 0; i < events.length; i++) {
-                if (events[i]._id == event._id) {
-                    events[i].borderColor = "#e6e600";//light yellow
-                } else {
-                    events[i].borderColor = "black";
-                }
-            }
-
-            $('#calendar').fullCalendar("rerenderEvents");
+            eventClickHandler(event, jsEvent, view);
         },
 
         //when an event is changed, alter its color
         eventDrop: function (event, delta, revertFunc, jsEvent, ui, view) {
+            //TODO: add handler
             handleOverlaps();
         },
         eventResize: function (event, delta, revertFunc, jsEvent, ui, view) {
+            //TODO: add handler
             handleOverlaps();
         },
     });
 
+    eventRenderHandler();
+
     //make sure calendar is the correct height
     adjustCalendarHeight();
+}
+
+function eventClickHandler(event, jsevent, view) {
+
+    //manageClasses page
+    if (document.getElementById("mc_manageClasses_input_crn")) {
+        var events = $('#calendar').fullCalendar('clientEvents')
+        var foundEvents = [];
+        for (var i = 0; i < events.length; i++) {
+            if (events[i].title == event.title) { //TODO: highlight by title, only overlap checks _id
+                events[i].borderColor = "#e6e600";//light yellow
+                foundEvents.push(events[i]);
+            } else {
+                events[i].borderColor = "black";
+            }
+        }
+        //put class data class input section
+        manageClasses_previewSelected(foundEvents);
+
+        //change available buttons
+        var addClassBtn = document.getElementById("mc_manageClasses_addClassBtn");
+        var updateClassBtn = document.getElementById("mc_manageClasses_updateClassBtn");
+        var clearSelectionBtn = document.getElementById("mc_manageClasses_clearSelectionBtn");
+
+        addClassBtn.disabled = true;
+        addClassBtn.style.opacity = 0.4;
+        updateClassBtn.disabled = false;
+        updateClassBtn.style.opacity = 1;
+        clearSelectionBtn.disabled = false;
+        clearSelectionBtn.style.opacity = 1;
+    }
+
+    //TODO: handle other pages
+
+    $('#calendar').fullCalendar("rerenderEvents");
+}
+
+function eventDropHandler(event, delta, revertFunc, jsEvent, ui, view) {
+    //TODO: implement
+    return;
+}
+
+function eventResizeHandler(event, delta, revertFunc, jsEvent, ui, view) {
+    //TODO: implement
+    return;
+}
+
+//render classes to the calendar
+function eventRenderHandler() {
+    //manageClasses page
+    if (document.getElementById("mc_manageClasses_input_crn")) {
+        var events = [];
+        for (key in kClasses) {
+            classData = kClasses[key];
+            //add each time as an event
+            for (var t = 0; t < classData.times.length; t++) {
+                var startTime = classData.times[t][0];
+                var endTime = classData.times[t][1];
+                var days = classData.days[t];
+                var event = {
+                    id: key + "_" + t, //crn stored as id
+                    title: classData.title,
+                    start: startTime,
+                    end: endTime,
+                    dow: days,
+                    color: '#5f5f5f',
+                    borderColor: 'black',
+                    textColor: 'black',
+                    editable: true,
+                    className: "calendarEvent_moreBorder",
+                };
+                events.push(event);
+            }
+        }
+
+        $("#calendar").fullCalendar('renderEvents', events);
+    }
 }
 
 function adjustCalendarHeight() {
@@ -437,7 +643,7 @@ function time_24ToMeridian(timeString) {
 //"4:30 PM" --> "16:30"
 function time_meridianTo24(timeString) {
     var timeSplit = timeString.split(':');
-    var hours = timeSplit[0];
+    var hours = parseInt(timeSplit[0]);
     var minutes = timeSplit[1].substr(0, timeSplit[1].length - 3);
     var meridian = timeSplit[1].substr(timeSplit[1].length - 2);
 

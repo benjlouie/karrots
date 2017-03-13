@@ -340,8 +340,6 @@
 
     width: 20%;
     max-width: 200px;
-
-    transition: 1s;
 }
 .mc_manageClasses_menu_selectBtns button:first-child {
     flex-grow: 1;
@@ -367,4 +365,6 @@
     border: solid;
     border-width: 3px;
     border-color: #990000;
+
+    transition: 1s;
 }
