@@ -1,6 +1,21 @@
 ﻿//initialize everything as needed
 //should be called in order of declaration
 
+//globals
+kClasses = {
+    //this also serves as a template for how classes are stored
+    '00000': {
+        title: "Test Class",
+        course: "Test 123",
+        hrs: 3,
+        seats: 99,
+        building: "test building",
+        room: "test room",
+        times: [["11:00", "12:15"],["16:00","17:00"]], //times: [start, end]
+        days: [[1, 3],[2]], //days for each time section
+    }
+};
+
 window.onload = function () {
     startup_localStorage();
     startup_contentCalls();
@@ -24,6 +39,7 @@ function startup_localStorage() {
         ["mainContentFile", ""],
         ["mainContentCalendar", false],
         ["mainContentCalendarEventOverlap", false],
+        ["mainContentCalendarSelectedCrn", ""],
         ["mainContentMenuBar", false]
     ];
 
