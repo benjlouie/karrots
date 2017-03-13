@@ -245,64 +245,70 @@
 }
 
 .mc_manageClasses_menu {
-    height: calc(40% - 2px - 33px); /* mc_manageClassesCalendar - calendar border - menuBar*/
-    width: 50%;
+    display: flex;
+    height: calc(40% - 44px - 31px - 2px); /* mc_manageClassesCalendar diff - topnav - menuBar - calendar border*/
+}
+
+.mc_manageClasses_menu_inputs {
+    width: 40%;
+    max-width: 600px;
+    min-width: 265px;
     overflow-y: auto;
 }
-.mc_manageClasses_halfMenuItem {
-    display: inline-block;
-    vertical-align: top;
-    width: 49%;
+.mc_manageClasses_menu_inputs hr {
+    margin: 3px;
 }
-.mc_manageClasses_menuItem {
-    display: inline-block;
-    vertical-align: top;
-    width: 49%;
-}
-.mc_manageClasses_menuItem > input {
+.mc_manageClasses_menu_inputContainer {
     width: 100%;
 }
-.mc_manageClasses_menuItem_time {
-    display: inline-block;
-    vertical-align: top;
-    justify-content: space-between;
+.mc_manageClasses_menu_inputContainer label {
+    float: left;
 }
-.mc_manageClasses_menuItem_time > input {
-    text-align: center;
+.mc_manageClasses_menu_inputContainer div {
+    overflow: hidden;
 }
-.mc_manageClasses_menuItem_dayBoxes {
-    display: inline-block;
+.mc_manageClasses_menu_inputContainer input {
+    float: right;
 }
-.mc_manageClasses_menuItem_checkbox {
-    display: inline-block;
-    vertical-align: top;
-    text-align: center;
-}
-.mc_manageClasses_menuItem_checkbox > input {
-    width: 20px;
-    height: 20px;
-    margin: 0px;
-    padding: 0px;
-}
-.mc_manageClasses_menuItem_addTimeBtn {
-    display: inline-block;
-    width: 50%;
-}
-.mc_manageClasses_menuItem_addTimeBtn > button {
-    width: 100%;
-}
-.mc_manageClasses_menuItem_timesList {
-    display: inline-block;
-    width: 100%;
-    height: calc(0.25 * (40vw - 31px - 43px)); /*25% of what is not taken by calendar - menuBar - topNav*/
-    overflow-y: scroll;
-}
-.mc_manageClasses_menuItem_timesList_header {
-    position: absolute;
-    margin-top: -1em;
 
+.mc_manageClasses_menu_times {
+    display: flex;
+    justify-content: center;
 }
-.mc_manageClasses_menuItem_timesList table {
+.mc_manageClasses_menu_times div {
+    display: block;
+}
+.mc_manageClasses_menu_times div:first-child {
+    white-space: nowrap;
+    overflow-x: hidden;
+}
+.mc_manageClasses_menu_times div:last-child {
+    white-space: nowrap;
+    overflow-x: hidden;
+}
+.mc_manageClasses_menu_times button {
+    width: 100%;
+}
+.mc_manageClasses_addTime_container {
+    display: flex;
+}
+.mc_manageClasses_addTime_container div {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+.mc_manageClasses_addTime_container input { /*checkboxes*/
+    margin: 1px;
+}
+.mc_manageClasses_addTime_container button {
+    flex-grow: 1;
+}
+
+.mc_manageClasses_menu_timesList {
+    display: inline-block;
+    width: 100%;
+}
+.mc_manageClasses_menu_timesList table {
     width: 100%;
     background-color: #5f5f5f;
     color: #c4c4bc;
@@ -311,14 +317,54 @@
 
     border-collapse: collapse;
 }
-.mc_manageClasses_menuItem_timesList tbody td {
+.mc_manageClasses_menu_timesList tbody td {
     border: solid;
     border-color: black;
     border-width: 1px;
 }
-.mc_manageClasses_menuItem_timesList tbody td:first-child {
+.mc_manageClasses_menu_timesList tbody td:first-child {
     border-left-width: 0px;
 }
-.mc_manageClasses_menuItem_timesList tbody td:last-child {
+.mc_manageClasses_menu_timesList tbody td:last-child {
     border-right-width: 0px;
+}
+
+.mc_manageClasses_menu_timesList tr td:last-child:hover {
+    cursor: pointer;
+    background-color: black;
+}
+
+.mc_manageClasses_menu_selectBtns {
+    display: flex;
+    flex-direction: column;
+
+    width: 20%;
+    max-width: 200px;
+
+    transition: 1s;
+}
+.mc_manageClasses_menu_selectBtns button:first-child {
+    flex-grow: 1;
+}
+.mc_manageClasses_menu_selectBtns button:nth-of-type(2) {
+    flex-grow: 0.2;
+}
+.mc_manageClasses_menu_selectBtns button:last-of-type {
+    flex-grow: 0.5;
+}
+#mc_manageClasses_addClassBtn {
+    opacity: 1;
+}
+#mc_manageClasses_updateClassBtn {
+    opacity: 0.4;
+}
+#mc_manageClasses_clearSelectionBtn {
+    opacity: 0.4;
+}
+.mc_manageClasses_menu_selectBtns p {
+    display: none;
+    padding: 2px;
+    border: solid;
+    border-width: 3px;
+    border-color: #990000;
 }

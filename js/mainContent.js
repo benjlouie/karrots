@@ -56,6 +56,165 @@ function classListRowClick(element) {
     }
 }
 
+////ManageClasses Specific////
+function manageClasses_addTime(element) {
+    var startTime = document.getElementById("mc_manageClasses_timeStart");
+    var endTime = document.getElementById("mc_manageClasses_timeEnd");
+    var checkedDays = [];
+    var dayAbbrev = {
+        0: 'U',
+        1: 'M',
+        2: 'T',
+        3: 'W',
+        4: 'R',
+        5: 'F',
+        6: 'S'
+    };
+
+    //check times
+    if (startTime.value == "" || endTime.value == ""
+    || startTime.value > endTime.value) {
+        //TODO: add a popup or something
+        return;
+    }
+
+    //check days
+    var validDay = false;
+    var dayString = "";
+    //list of <div><label \><input \></div> elements
+    var timeData = document.getElementById("mc_manageClasses_addTime_container").children;
+    for (var i = 0; i < 7; i++) {
+        //get checkbox
+        var dayCheckbox = timeData[i].lastElementChild;
+        checkedDays[i] = dayCheckbox;
+        validDay |= checkedDays[i].checked;
+        if (checkedDays[i].checked) {
+            dayString += dayAbbrev[i] + " ";
+        }
+    }
+    if (!validDay) {
+        //TODO: add a popup or something
+        return;
+    }
+
+    //make new node
+    dayString = dayString.substr(0, dayString.length - 1);
+    var timeEntry = document.createElement("tr");
+    //startTime
+    var td = document.createElement("td");
+    td.appendChild(document.createTextNode(time_24ToMeridian(startTime.value)));
+    timeEntry.appendChild(td);
+    //endTime
+    td = document.createElement("td");
+    td.appendChild(document.createTextNode(time_24ToMeridian(endTime.value)));
+    timeEntry.appendChild(td);
+    //days
+    td = document.createElement("td");
+    td.appendChild(document.createTextNode(dayString));
+    timeEntry.appendChild(td);
+    //remove clickable
+    td = document.createElement("td");
+    td.appendChild(document.createTextNode("Remove"));
+    td.onclick = function () { manageClasses_timeListRemove(this) }; //needed lambda for function arg
+    timeEntry.appendChild(td);
+
+    var timesListBody = document.getElementById("mc_manageClasses_timesList");
+    timesListBody.appendChild(timeEntry);
+
+    return;
+}
+
+function manageClasses_timeListRemove(element) {
+    var tr = element.parentNode;
+    var tbody = tr.parentNode;
+
+    tbody.removeChild(tr);
+
+    return;
+}
+
+function manageClasses_addClass() {
+    var crn = document.getElementById("mc_manageClasses_input_crn");
+    var title = document.getElementById("mc_manageClasses_input_title");
+    var course = document.getElementById("mc_manageClasses_input_course");
+    var hrs = document.getElementById("mc_manageClasses_input_hrs");
+    var seats = document.getElementById("mc_manageClasses_input_seats");
+    var building = document.getElementById("mc_manageClasses_input_building");
+    var room = document.getElementById("mc_manageClasses_input_room");
+
+    var errorList = document.getElementById("mc_manageClasses_errorList");
+    //clear errorList
+    while (errorList.firstChild) {
+        errorList.removeChild(errorList.firstChild);
+    }
+    //init errorList
+    errorList.appendChild(document.createTextNode("Missing Requirements:"));
+    errorList.appendChild(document.createElement("br"));
+
+    var validAdd = true;
+
+    if (crn.value == "") {
+        errorList.appendChild(document.createTextNode("CRN #"));
+        errorList.appendChild(document.createElement("br"));
+        validAdd = false;
+    }
+    if (title.value == "") {
+        errorList.appendChild(document.createTextNode("Title"));
+        errorList.appendChild(document.createElement("br"));
+        validAdd = false;
+    }
+    if (course.value == "") {
+        errorList.appendChild(document.createTextNode("Course Name"));
+        errorList.appendChild(document.createElement("br"));
+        validAdd = false;
+    }
+    if (hrs.value == "") {
+        errorList.appendChild(document.createTextNode("Hrs #"));
+        errorList.appendChild(document.createElement("br"));
+        validAdd = false;
+    }
+    if (seats.value == "") {
+        errorList.appendChild(document.createTextNode("Seats #"));
+        errorList.appendChild(document.createElement("br"));
+        validAdd = false;
+    }
+    if (building.value == "") {
+        building.value = "TBD";
+    }
+    if (room.value == "") {
+        room.value = "TBD";
+    }
+    
+    var timeListBody = document.getElementById("mc_manageClasses_timesList");
+    var times = timeListBody.children;
+    if (times.length == 0) {
+        errorList.appendChild(document.createTextNode("At least one time"));
+        errorList.appendChild(document.createElement("br"));
+        validAdd = false;
+    }
+
+    if (validAdd) {
+        //valid, hide errorList
+        errorList.style.display = "none";
+    } else {
+        //not valid, display errors and exit
+        errorList.style.display = "initial";
+        return;
+    }
+
+    //TODO: add class to list of classes
+
+    //add event to calendar
+
+}
+
+function manageClasses_updateClass() {
+
+}
+
+function manageClasses_clearSelection() {
+
+}
 
 ////Calendar////
 function makeCalendar() {
@@ -86,8 +245,9 @@ function makeCalendar() {
         events: [
             {
                 title: 'CSE 221',
-                start: '2017-02-21 07:30:00',
-                end: '2017-02-21 08:45:00',
+                start: '07:30',
+                end: '08:45',
+                dow: [2],
                 color: '#5f5f5f',
                 borderColor: 'black',
                 textColor: 'black',
@@ -96,8 +256,9 @@ function makeCalendar() {
             },
             {
                 title: 'CSE 222L',
-                start: '2017-02-22 10:30:00',
-                end: '2017-02-22 12:45:00',
+                start: '10:30',
+                end: '12:45',
+                dow: [3],
                 color: '#5f5f5f',
                 borderColor: 'black',
                 textColor: 'black',
@@ -106,8 +267,8 @@ function makeCalendar() {
             },
             {
                 title: 'CSE 113',
-                start: '09:00:00',
-                end: '10:15:00',
+                start: '09:00',
+                end: '10:15',
                 dow: [1,3,5], //repeat on monday, wednesday, and friday
 
                 color: '#5f5f5f',
@@ -246,4 +407,43 @@ function getOverlappingEvents() {
     }
 
     return overlappingEvents;
+}
+
+////Other////
+
+//converts time
+//"16:30" --> "4:30 PM"
+function time_24ToMeridian(timeString) {
+    var timeSplit = timeString.split(':');
+    var hours = timeSplit[0];
+    var minutes = timeSplit[1];
+    var meridian;
+    if (hours > 12) {
+        meridian = 'PM';
+        hours -= 12;
+    } else if (hours < 12) {
+        meridian = 'AM';
+        if (hours == 0) {
+            hours = 12;
+        }
+    } else {
+        meridian = 'PM';
+    }
+
+    return hours + ":" + minutes + " " + meridian;
+}
+
+//converts time
+//"4:30 PM" --> "16:30"
+function time_meridianTo24(timeString) {
+    var timeSplit = timeString.split(':');
+    var hours = timeSplit[0];
+    var minutes = timeSplit[1].substr(0, timeSplit[1].length - 3);
+    var meridian = timeSplit[1].substr(timeSplit[1].length - 2);
+
+    if (meridian == "PM") {
+        hours += 12;
+    }
+
+    return hours + ":" + minutes;
 }
