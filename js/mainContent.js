@@ -229,7 +229,7 @@ function manageClasses_addClass() {
             eventDays.push(dayAbbrev[days[d]]);
         }
 
-        classTimes.push([startTime, endTime]);
+        classTimes.push([time_meridianTo24(startTime), time_meridianTo24(endTime)]);
         classDays.push(eventDays);
 
         events[i] = {
@@ -432,7 +432,7 @@ function makeCalendar() {
         },
     });
 
-    eventRenderHandler();
+    eventsInitialRender();
 
     //make sure calendar is the correct height
     adjustCalendarHeight();
@@ -459,13 +459,16 @@ function eventClickHandler(event, jsevent, view) {
         var addClassBtn = document.getElementById("mc_manageClasses_addClassBtn");
         var updateClassBtn = document.getElementById("mc_manageClasses_updateClassBtn");
         var clearSelectionBtn = document.getElementById("mc_manageClasses_clearSelectionBtn");
-
         addClassBtn.disabled = true;
         addClassBtn.style.opacity = 0.4;
         updateClassBtn.disabled = false;
         updateClassBtn.style.opacity = 1;
         clearSelectionBtn.disabled = false;
         clearSelectionBtn.style.opacity = 1;
+
+        //clear errorList
+        var errorList = document.getElementById("mc_manageClasses_errorList");
+        errorList.style.display = "none";
     }
 
     //TODO: handle other pages
@@ -484,7 +487,10 @@ function eventResizeHandler(event, delta, revertFunc, jsEvent, ui, view) {
 }
 
 //render classes to the calendar
-function eventRenderHandler() {
+function eventsInitialRender() {
+    //remove selection if it's there
+    localStorage.setItem("mainContentCalendarSelectedCrn", "");
+
     //manageClasses page
     if (document.getElementById("mc_manageClasses_input_crn")) {
         var events = [];
@@ -497,7 +503,7 @@ function eventRenderHandler() {
                 var days = classData.days[t];
                 var event = {
                     id: key + "_" + t, //crn stored as id
-                    title: classData.title,
+                    title: classData.course, //use course name for event title
                     start: startTime,
                     end: endTime,
                     dow: days,
@@ -615,13 +621,13 @@ function getOverlappingEvents() {
     return overlappingEvents;
 }
 
-////Other////
+/*//Other//*/
 
 //converts time
 //"16:30" --> "4:30 PM"
 function time_24ToMeridian(timeString) {
     var timeSplit = timeString.split(':');
-    var hours = timeSplit[0];
+    var hours = parseInt(timeSplit[0]);
     var minutes = timeSplit[1];
     var meridian;
     if (hours > 12) {

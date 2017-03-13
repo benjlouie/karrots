@@ -45,7 +45,7 @@
 .mc_sideList a {
     display: block;
     color: #f1f1f1;
-    white-space: nowrap; /*TODO: change? what if list gets too small?*/
+    white-space: nowrap;
     padding: 2px 2px 2px 2px;
 }
 .mc_sideList a:hover {
