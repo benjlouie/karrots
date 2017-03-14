@@ -223,8 +223,8 @@ function manageClasses_addClass() {
     for (var i = 0; i < times.length; i++) {
         var timeData = times[i].children;
         var startTime = timeData[0].innerHTML;
-        startTime = time_meridianTo24(startTime);
         var endTime = timeData[1].innerHTML;
+        startTime = time_meridianTo24(startTime);
         endTime = time_meridianTo24(endTime);
         //get days
         var eventDays = [];
@@ -233,7 +233,6 @@ function manageClasses_addClass() {
         for (var d = 0; d < days.length; d++) {
             eventDays.push(dayAbbrev[days[d]]);
         }
-
 
         classTimes.push([startTime, endTime]);
         classDays.push(eventDays);
