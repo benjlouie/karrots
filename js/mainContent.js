@@ -129,9 +129,7 @@ function manageClasses_timeListRemove(element) {
     var tbody = tr.parentNode;
 
     tbody.removeChild(tr);
-
-    //TODO: check if event is selected already, if yes, remove that calendar event too
-    //remove time/classTime from global kClasses as well
+    
     return;
 }
 
@@ -159,13 +157,18 @@ function manageClasses_addClass() {
         errorList.removeChild(errorList.firstChild);
     }
     //init errorList
-    errorList.appendChild(document.createTextNode("Missing Requirements:"));
+    errorList.appendChild(document.createTextNode("Missing/Errors:"));
     errorList.appendChild(document.createElement("br"));
 
     var validAdd = true;
 
     if (crn.value == "") {
         errorList.appendChild(document.createTextNode("CRN #"));
+        errorList.appendChild(document.createElement("br"));
+        validAdd = false;
+    } else if (crn.value in kClasses) {
+        //crn is already in global class list
+        errorList.appendChild(document.createTextNode("CRN # Already taken"));
         errorList.appendChild(document.createElement("br"));
         validAdd = false;
     }
@@ -220,7 +223,9 @@ function manageClasses_addClass() {
     for (var i = 0; i < times.length; i++) {
         var timeData = times[i].children;
         var startTime = timeData[0].innerHTML;
+        startTime = time_meridianTo24(startTime);
         var endTime = timeData[1].innerHTML;
+        endTime = time_meridianTo24(endTime);
         //get days
         var eventDays = [];
         var days = timeData[2].innerHTML;
@@ -229,14 +234,15 @@ function manageClasses_addClass() {
             eventDays.push(dayAbbrev[days[d]]);
         }
 
-        classTimes.push([time_meridianTo24(startTime), time_meridianTo24(endTime)]);
+
+        classTimes.push([startTime, endTime]);
         classDays.push(eventDays);
 
         events[i] = {
             id: crn.value + "_" + i,
             title: course.value,
-            start: time_meridianTo24(startTime),
-            end: time_meridianTo24(endTime),
+            start: startTime,
+            end: endTime,
             dow: eventDays,
             color: '#5f5f5f',
             borderColor: 'black',
@@ -264,10 +270,30 @@ function manageClasses_addClass() {
 }
 
 function manageClasses_updateClass() {
+    //remove selected CRN from classList
+    var selectedCrn = localStorage.getItem("mainContentCalendarSelectedCrn");
+    delete kClasses[selectedCrn];
+    //remove selected CRN from calendar
+    $("#calendar").fullCalendar('removeEvents', function (event) {
+        selectedCrn = localStorage.getItem("mainContentCalendarSelectedCrn");
+        eventCrn = event._id.split("_")[0];
+        if (eventCrn == selectedCrn) {
+            return true;
+        }
+        return false;
+    });
 
+    //add the class and times like normal
+    manageClasses_addClass();
+
+    highlightSelectedEvents();
+    $("#calendar").fullCalendar('rerenderEvents');
 }
 
 function manageClasses_clearSelection() {
+    //clear selection from localStorage
+    localStorage.setItem("mainContentCalendarSelectedCrn", "");
+
     var crn = document.getElementById("mc_manageClasses_input_crn");
     var title = document.getElementById("mc_manageClasses_input_title");
     var course = document.getElementById("mc_manageClasses_input_course");
@@ -291,7 +317,7 @@ function manageClasses_clearSelection() {
 
     //deselect classes in calendar
     var calendar = $('#calendar');
-    var events = calendar.fullCalendar('clientEvents')
+    var events = calendar.fullCalendar('clientEvents');
     for (var i = 0; i < events.length; i++) {
         events[i].borderColor = "black";
     }
@@ -301,18 +327,47 @@ function manageClasses_clearSelection() {
     var addClassBtn = document.getElementById("mc_manageClasses_addClassBtn");
     var updateClassBtn = document.getElementById("mc_manageClasses_updateClassBtn");
     var clearSelectionBtn = document.getElementById("mc_manageClasses_clearSelectionBtn");
+    var deleteSelectionBtn = document.getElementById("mc_manageClasses_deleteSelectionBtn");
     addClassBtn.disabled = false;
     addClassBtn.style.opacity = 1;
     updateClassBtn.disabled = true;
     updateClassBtn.style.opacity = 0.4;
     clearSelectionBtn.disabled = true;
     clearSelectionBtn.style.opacity = 0.4;
+    deleteSelectionBtn.disabled = true;
+    deleteSelectionBtn.style.opacity = 0.4;
 }
 
-function manageClasses_previewSelected(events) {
-    if (events.length == 0) {
+function manageClasses_deleteSelection() {
+    var selectedCrn = localStorage.getItem("mainContentCalendarSelectedCrn");
+    if (selectedCrn == "") {
         return;
     }
+
+    //delete class from global kClasses
+    delete kClasses[selectedCrn];
+
+    //remove class events from calendar
+    $('#calendar').fullCalendar('removeEvents', function (event) {
+        var selectedCrn = localStorage.getItem("mainContentCalendarSelectedCrn");
+        var eventCrn = event._id.split("_")[0];
+        if (eventCrn == selectedCrn) {
+            return true;
+        }
+        return false;
+    });
+
+    //clear selection
+    manageClasses_clearSelection();
+}
+
+//previews the selected class in the input area, includes all class data and times
+function manageClasses_previewSelected() {
+    var selectedCrn = localStorage.getItem("mainContentCalendarSelectedCrn");
+    if (selectedCrn == "") {
+        return;
+    }
+
     var dayAbbrev = {
         0: 'U',
         1: 'M',
@@ -331,12 +386,10 @@ function manageClasses_previewSelected(events) {
     var room = document.getElementById("mc_manageClasses_input_room");
 
     //put the selected class into the form
-    //fill form from event.title, times by event._id
-    var eventCrn = events[0]._id.split("_")[0]; //_id is #####_#, we just want the front part
-    localStorage.setItem("mainContentCalendarRemoveCrn", eventCrn);
+    //fill form from event.title, times by selected Crn
     //get class data from global
-    var classData = kClasses[eventCrn];
-    crn.value = eventCrn;
+    var classData = kClasses[selectedCrn];
+    crn.value = selectedCrn;
     title.value = classData.title;
     course.value = classData.course;
     hrs.value = classData.hrs;
@@ -423,11 +476,9 @@ function makeCalendar() {
 
         //when an event is changed, alter its color
         eventDrop: function (event, delta, revertFunc, jsEvent, ui, view) {
-            //TODO: add handler
             handleOverlaps();
         },
         eventResize: function (event, delta, revertFunc, jsEvent, ui, view) {
-            //TODO: add handler
             handleOverlaps();
         },
     });
@@ -442,29 +493,28 @@ function eventClickHandler(event, jsevent, view) {
 
     //manageClasses page
     if (document.getElementById("mc_manageClasses_input_crn")) {
-        var events = $('#calendar').fullCalendar('clientEvents')
-        var foundEvents = [];
-        for (var i = 0; i < events.length; i++) {
-            if (events[i].title == event.title) { //TODO: highlight by title, only overlap checks _id
-                events[i].borderColor = "#e6e600";//light yellow
-                foundEvents.push(events[i]);
-            } else {
-                events[i].borderColor = "black";
-            }
-        }
+        //set selected CRN
+        var eventCrn = event._id.split("_")[0]; //#####_# we just want the first part
+        localStorage.setItem("mainContentCalendarSelectedCrn", eventCrn);
+
+        //change border colors for each event
+        highlightSelectedEvents();
         //put class data class input section
-        manageClasses_previewSelected(foundEvents);
+        manageClasses_previewSelected();
 
         //change available buttons
         var addClassBtn = document.getElementById("mc_manageClasses_addClassBtn");
         var updateClassBtn = document.getElementById("mc_manageClasses_updateClassBtn");
         var clearSelectionBtn = document.getElementById("mc_manageClasses_clearSelectionBtn");
+        var deleteSelectionBtn = document.getElementById("mc_manageClasses_deleteSelectionBtn");
         addClassBtn.disabled = true;
         addClassBtn.style.opacity = 0.4;
         updateClassBtn.disabled = false;
         updateClassBtn.style.opacity = 1;
         clearSelectionBtn.disabled = false;
         clearSelectionBtn.style.opacity = 1;
+        deleteSelectionBtn.disabled = false;
+        deleteSelectionBtn.style.opacity = 1;
 
         //clear errorList
         var errorList = document.getElementById("mc_manageClasses_errorList");
@@ -476,13 +526,32 @@ function eventClickHandler(event, jsevent, view) {
     $('#calendar').fullCalendar("rerenderEvents");
 }
 
+//highlights events with CRN equal to the selected CRN
+//returns list of events that were found
+function highlightSelectedEvents() {
+    var foundEvents = [];
+    var selectedCrn = localStorage.getItem("mainContentCalendarSelectedCrn");
+    var events = $('#calendar').fullCalendar('clientEvents');
+    for (var i = 0; i < events.length; i++) {
+        var eventCrn = events[i]._id.split("_")[0];
+        if (eventCrn == selectedCrn) {
+            events[i].borderColor = "#e6e600";//light yellow
+            foundEvents.push(events[i]);
+        } else {
+            events[i].borderColor = "black";
+        }
+    }
+
+    return foundEvents;
+}
+
 function eventDropHandler(event, delta, revertFunc, jsEvent, ui, view) {
-    //TODO: implement
+    //TODO: implement handler
     return;
 }
 
 function eventResizeHandler(event, delta, revertFunc, jsEvent, ui, view) {
-    //TODO: implement
+    //TODO: implement handler
     return;
 }
 
@@ -653,7 +722,7 @@ function time_meridianTo24(timeString) {
     var minutes = timeSplit[1].substr(0, timeSplit[1].length - 3);
     var meridian = timeSplit[1].substr(timeSplit[1].length - 2);
 
-    if (meridian == "PM") {
+    if (meridian == "PM" && hours < 12) {
         hours += 12;
     }
 

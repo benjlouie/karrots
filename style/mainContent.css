@@ -347,16 +347,13 @@
 .mc_manageClasses_menu_selectBtns button:nth-of-type(2) {
     flex-grow: 0.2;
 }
-.mc_manageClasses_menu_selectBtns button:last-of-type {
+.mc_manageClasses_menu_selectBtns button:nth-of-type(3) {
     flex-grow: 0.5;
 }
 #mc_manageClasses_addClassBtn {
     opacity: 1;
 }
-#mc_manageClasses_updateClassBtn {
-    opacity: 0.4;
-}
-#mc_manageClasses_clearSelectionBtn {
+#mc_manageClasses_updateClassBtn, #mc_manageClasses_clearSelectionBtn, #mc_manageClasses_deleteSelectionBtn {
     opacity: 0.4;
 }
 .mc_manageClasses_menu_selectBtns p {
