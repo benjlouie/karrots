@@ -6,6 +6,7 @@ kClasses = {
     //this also serves as a template for how classes are stored
     //These classes will only be loaded on first startup
     '00000': {
+        section: "none", //like computer science, biology, etc
         title: "Test Class",
         course: "Test 123",
         teacher: "TBD",

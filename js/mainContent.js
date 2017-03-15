@@ -68,19 +68,27 @@ function manageClasses_addTime(element) {
         3: 'W',
         4: 'R',
         5: 'F',
-        6: 'S'
+        6: 'S',
+        U: 0,
+        M: 1,
+        T: 2,
+        W: 3,
+        R: 4,
+        F: 5,
+        S: 6
     };
 
     //check times
     if (startTime.value == "" || endTime.value == ""
     || startTime.value > endTime.value) {
-        //TODO: add a popup or something
+        //TODO: add a popup or something (no time/bad time)
         return;
     }
 
     //check days
     var validDay = false;
     var dayString = "";
+    var days = {};
     //list of <div><label \><input \></div> elements
     var timeData = document.getElementById("mc_manageClasses_addTime_container").children;
     for (var i = 0; i < 7; i++) {
@@ -90,23 +98,49 @@ function manageClasses_addTime(element) {
         validDay |= checkedDays[i].checked;
         if (checkedDays[i].checked) {
             dayString += dayAbbrev[i] + " ";
+            days[dayAbbrev[i]] = true; //for use when checking for time conflicts
         }
     }
+    dayString = dayString.substr(0, dayString.length - 1);
     if (!validDay) {
-        //TODO: add a popup or something
+        //TODO: add a popup or something (no days selected)
         return;
     }
 
+    var startTimeMeridian = time_24ToMeridian(startTime.value);
+    var endTimeMeridian = time_24ToMeridian(endTime.value);
+
+    //ensure time isn't already in list
+    var timesListBody = document.getElementById("mc_manageClasses_timesList");
+    var times = timesListBody.children;
+    //go through each timeList entry
+    for (var i = 0; i < times.length; i++) {
+        var timeData = times[i].children;
+        var curStart = time_meridianTo24(timeData[0].innerHTML);
+        var curEnd = time_meridianTo24(timeData[1].innerHTML);
+        //check for time conflict
+        if (curStart < endTime.value && curEnd > startTime.value) {
+            //is it on an overlapping day?
+            var curDays = timeData[2].innerHTML.split(" ");
+            for (var d = 0; d < curDays.length; d++) {
+                if (curDays[d] in days) {
+                    //overlapping time conflict, don't add
+                    //TODO: add a popup or something (day-time overlap)
+                    return;
+                }
+            }
+        }
+    }
+
     //make new node
-    dayString = dayString.substr(0, dayString.length - 1);
     var timeEntry = document.createElement("tr");
     //startTime
     var td = document.createElement("td");
-    td.appendChild(document.createTextNode(time_24ToMeridian(startTime.value)));
+    td.appendChild(document.createTextNode(startTimeMeridian));
     timeEntry.appendChild(td);
     //endTime
     td = document.createElement("td");
-    td.appendChild(document.createTextNode(time_24ToMeridian(endTime.value)));
+    td.appendChild(document.createTextNode(endTimeMeridian));
     timeEntry.appendChild(td);
     //days
     td = document.createElement("td");
@@ -118,7 +152,6 @@ function manageClasses_addTime(element) {
     td.onclick = function () { manageClasses_timeListRemove(this) }; //needed lambda for function arg
     timeEntry.appendChild(td);
 
-    var timesListBody = document.getElementById("mc_manageClasses_timesList");
     timesListBody.appendChild(timeEntry);
 
     return;
@@ -366,16 +399,6 @@ function manageClasses_previewSelected() {
     if (selectedCrn == "") {
         return;
     }
-
-    var dayAbbrev = {
-        0: 'U',
-        1: 'M',
-        2: 'T',
-        3: 'W',
-        4: 'R',
-        5: 'F',
-        6: 'S'
-    };
     var crn = document.getElementById("mc_manageClasses_input_crn");
     var title = document.getElementById("mc_manageClasses_input_title");
     var course = document.getElementById("mc_manageClasses_input_course");
@@ -396,6 +419,26 @@ function manageClasses_previewSelected() {
     building.value = classData.building;
     room.value = classData.room;
 
+    manageClasses_previewSelected_times();
+}
+
+//updates the timelist with the selected CRN's times
+//if optional CRN is specified, will show for that specific CRN
+function manageClasses_previewSelected_times(optionalCRN) {
+    var selectedCrn = optionalCRN;
+    if (selectedCrn == null || parseInt(selectedCrn) == NaN) {
+        selectedCrn = localStorage.getItem("mainContentCalendarSelectedCrn");
+    }
+    var dayAbbrev = {
+        0: 'U',
+        1: 'M',
+        2: 'T',
+        3: 'W',
+        4: 'R',
+        5: 'F',
+        6: 'S'
+    };
+    var classData = kClasses[selectedCrn];
     var classTimes = classData.times;
     var classDays = classData.days;
     var timesListBody = document.getElementById("mc_manageClasses_timesList");
@@ -474,10 +517,15 @@ function makeCalendar() {
         },
 
         //when an event is changed, alter its color
+        eventDragStart: function (event, jsEvent, ui, view) {
+            eventDragStartHandler(event, jsEvent, ui, view);
+        },
         eventDrop: function (event, delta, revertFunc, jsEvent, ui, view) {
+            eventDropHandler(event, delta, revertFunc, jsEvent, ui ,view);
             handleOverlaps();
         },
         eventResize: function (event, delta, revertFunc, jsEvent, ui, view) {
+            eventResizeHandler(event, delta, revertFunc, jsEvent, ui, view);
             handleOverlaps();
         },
     });
@@ -544,9 +592,84 @@ function highlightSelectedEvents() {
     return foundEvents;
 }
 
+//TODO: use better way, like localStorage eventually
+var kEventDragStartSave = {};
+//saves the original event so it can be used with eventDropHandler
+function eventDragStartHandler(event, jsEvent, ui, view) {
+    //TODO: change this terrible line, just get needed info
+    kEventDragStartSave = JSON.parse(JSON.stringify(event));
+}
+
 function eventDropHandler(event, delta, revertFunc, jsEvent, ui, view) {
-    //TODO: implement handler
-    return;
+    //manageClasses page
+    if (document.getElementById("mc_manageClasses_input_crn")) {
+        //update time entry in global
+
+        var startHours = string_pad(event.start._d.getUTCHours(), 2);
+        var startMinutes = string_pad(event.start._d.getUTCMinutes(), 2);
+        var startTime = startHours + ":" + startMinutes;
+        var endHours = string_pad(event.end._d.getUTCHours(), 2);
+        var endMinutes = string_pad(event.end._d.getUTCMinutes(), 2);
+        var endTime = endHours + ":" + endMinutes;
+        //get original times
+        var changeHours = delta._data.hours;
+        var changeMinutes = delta._data.minutes;
+
+        var oldStartTime = time_dayChanges(startHours, startMinutes, changeHours, changeMinutes);
+        var oldEndTime = time_dayChanges(endHours, endMinutes, changeHours, changeMinutes);
+
+        var dayChange = delta._data.days + oldStartTime["dayChange"];
+        oldStartTime = string_makeTime(oldStartTime["hours"], oldStartTime["minutes"]);
+        oldEndTime = string_makeTime(oldEndTime["hours"], oldEndTime["minutes"]);
+
+        //get original days
+        var newDays = event.dow;
+        var oldDays = [];
+        for (var d = 0; d < newDays.length; d++) {
+            oldDays[d] = newDays[d] + dayChange;
+        }
+
+        time_dayChanges()
+
+        //replace old times with new
+        var eventCrn = event._id.split("_")[0];
+        var curClass = kClasses[eventCrn];
+        var times = curClass.times;
+        var days = curClass.days;
+
+        for (var t = 0; t < times.length; t++) {
+            if (oldStartTime == times[t][0] && oldEndTime == times[t][1]) {
+                //original times are equal
+                if (days.length != newDays.length) {
+                    continue;
+                }
+                var daysEqual = true;
+                for (var d = 0; d < days[t].length; d++) {
+                    if (days[t][d] != oldDays[d]) {
+                        daysEqual = false;
+                        break;
+                    }
+                }
+
+                if (daysEqual) {
+                    //found time, replace
+                    times[t] = [startTime, endTime];
+                    days[t] = newDays;
+                    return;
+                }
+            }
+        }
+
+
+        //update timeList if applicable
+        var selectedCrn = localStorage.getItem("mainContentCalendarSelectedCrn");
+        if (eventCrn == selectedCrn) {
+            //only show times event crn is currently selected
+            manageClasses_previewSelected_times();
+        }
+    }
+
+    //TODO: handle other pages
 }
 
 function eventResizeHandler(event, delta, revertFunc, jsEvent, ui, view) {
@@ -584,9 +707,10 @@ function eventsInitialRender() {
                 events.push(event);
             }
         }
-
         $("#calendar").fullCalendar('renderEvents', events);
     }
+
+    //TODO: handle other pages
 }
 
 function adjustCalendarHeight() {
@@ -726,4 +850,55 @@ function time_meridianTo24(timeString) {
     }
 
     return hours + ":" + minutes;
+}
+
+//returns {hours, minutes, dayChange}
+//24-hour format
+//TODO: make it work for change in hours > 24 and minutes >60
+function time_dayChanges(curHour, curMin, chgHour, chgMin) {
+    curHour = parseInt(curHour);
+    curMin = parseInt(curMin);
+    chgHour = parseInt(chgHour);
+    chgMin = parseInt(chgMin);
+
+    curHour -= chgHour;
+    curMin -= chgMin;
+
+    if (curMin < 0) {
+        curMin += 60;
+        curHour -= 1;
+    } else if (curMin >= 60) {
+        curMin -= 60;
+        curHour += 1;
+    }
+    var dayChange = 0;
+    if (curHour < 0) {
+        dayChange = -1;
+        curHour += 24;
+    } else if (curHour >= 24) {
+        dayChange = 1;
+        curHour -= 24;
+    }
+
+
+    return {
+        hours: curHour,
+        minutes: curMin,
+        dayChange: dayChange
+    };
+}
+
+function string_makeTime(hours, minutes) {
+    hours = string_pad(hours, 2);
+    minutes = string_pad(minutes, 2);
+    return hours + ":" + minutes;
+}
+
+//pads num to width using the padChar
+//padChar defaults to '0'
+//from stackoverflow
+function string_pad(num, width, padChar) {
+    padChar = padChar || '0';
+    num = num + '';
+    return num.length >= width ? num : new Array(width - num.length + 1).join(padChar) + num;
 }
