@@ -667,7 +667,11 @@ function eventDropHandler(event, delta, revertFunc, jsEvent, ui, view) {
                     if (overlaps.length > 0 || startTime > endTime) {
                         //overlaps, revert
                         revertFunc();
-                        event.dow = copy(oldDays); //IMPORTANT, revertFunc() doesn't correctly reset the dow
+                        //IMPORTANT, revertFunc() doesn't correctly reset the dow for these events
+                        var revertedEvents = $("#calendar").fullCalendar('clientEvents', event._id);
+                        for (var e = 0; e < revertedEvents.length; e++) {
+                            revertedEvents[e].dow = copy(oldDays);
+                        }
                         //save overlapping events to revert their color on next change
                         var overlapTable = {};
                         for (var e = 0; e < overlaps.length; e++) {
@@ -681,6 +685,13 @@ function eventDropHandler(event, delta, revertFunc, jsEvent, ui, view) {
                         //no overlaps, set data
                         times[t] = copy([startTime, endTime]);
                         days[t] = copy(newDays);
+
+                        //IMPORTANT, revertFunc() doesn't correctly reset the dow for these events
+                        //and just shit in general
+                        var revertedEvents = $("#calendar").fullCalendar('clientEvents', event._id);
+                        for (var e = 0; e < revertedEvents.length; e++) {
+                            revertedEvents[e].dow = copy(newDays);
+                        }
                     }
                     break;
                 }
