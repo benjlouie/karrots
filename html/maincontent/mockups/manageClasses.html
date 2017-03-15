@@ -1,0 +1,130 @@
+﻿<div class="mc_manageClasses_menuBar">
+    <ul id="mc_menuBar" class="mc_menuBar">
+        <!--loaded dynamically-->
+    </ul>
+</div>
+
+<!--calendar-->
+<div id="calendar" class="mc_manageClassesCalendar"></div>
+
+<div class="mc_manageClasses_menu">
+    <div class="mc_manageClasses_menu_inputs">
+        <div>
+            <div class="mc_manageClasses_menu_inputContainer">
+                <label>CRN #</label>
+                <div>
+                    <input id="mc_manageClasses_input_crn" type="number" placeholder="ex: 12345" />
+                </div>
+            </div>
+            <div class="mc_manageClasses_menu_inputContainer">
+                <label>Title</label>
+                <div>
+                    <input id="mc_manageClasses_input_title" type="text" placeholder="ex: Introduction to Algorithms" />
+                </div>
+            </div>
+            <div class="mc_manageClasses_menu_inputContainer">
+                <label>Course</label>
+                <div>
+                    <input id="mc_manageClasses_input_course" type="text" placeholder="ex: CSE 113L" />
+                </div>
+            </div>
+            <div class="mc_manageClasses_menu_inputContainer">
+                <label>Hrs</label>
+                <div>
+                    <input id="mc_manageClasses_input_hrs" type="number" placeholder="ex: 3" />
+                </div>
+            </div>
+            <div class="mc_manageClasses_menu_inputContainer">
+                <label>Seats</label>
+                <div>
+                    <input id="mc_manageClasses_input_seats" type="number" placeholder="ex: 35" />
+                </div>
+            </div>
+            <div class="mc_manageClasses_menu_inputContainer">
+                <label>Building</label>
+                <div>
+                    <input id="mc_manageClasses_input_building" type="text" placeholder="ex: CRAMER" />
+                </div>
+            </div>
+            <div class="mc_manageClasses_menu_inputContainer">
+                <label>Room</label>
+                <div>
+                    <input id="mc_manageClasses_input_room" type="text" placeholder="ex: 203A" />
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="mc_manageClasses_menu_times">
+            <div>
+                <label>Start Time</label>
+            </div>
+            <div>
+                <input id="mc_manageClasses_timeStart" type="time" placeholder="Start Time" />
+            </div>
+            <div>
+                <input id="mc_manageClasses_timeEnd" type="time" placeholder="End Time" />
+            </div>
+            <div>
+                <label>End Time</label>
+            </div>
+        </div>
+
+        <div id="mc_manageClasses_addTime_container" class="mc_manageClasses_addTime_container">
+            <div>
+                <label>U</label>
+                <input type="checkbox" /> 
+            </div>
+            <div>
+                <label>M</label>
+                <input type="checkbox" />
+            </div>
+            <div>
+                <label>T</label>
+                <input type="checkbox" />
+            </div>
+            <div>
+                <label>W</label>
+                <input type="checkbox" />
+            </div>
+            <div>
+                <label>R</label>
+                <input type="checkbox" />
+            </div>
+            <div>
+                <label>F</label>
+                <input type="checkbox" />
+            </div>
+            <div>
+                <label>S</label>
+                <input type="checkbox" />
+            </div>
+            <button type="button" onclick="manageClasses_addTime(this)">Add Time</button>
+        </div>
+
+        <div class="mc_manageClasses_menu_timesList">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Days</th>
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody id="mc_manageClasses_timesList">
+                    <!--added Dynamically-->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mc_manageClasses_menu_selectBtns">
+        <button id="mc_manageClasses_addClassBtn" onclick="manageClasses_addClass()">Add Class</button>
+        <button id="mc_manageClasses_updateClassBtn" onclick="manageClasses_updateClass()" disabled>Update Class</button>
+        <button id="mc_manageClasses_clearSelectionBtn" onclick="manageClasses_clearSelection()" disabled>Clear Selection</button>
+        <button id="mc_manageClasses_deleteSelectionBtn" onclick="manageClasses_deleteSelection()" disabled>Delete Selection</button>
+        <p id="mc_manageClasses_errorList">
+            <!--Errors when trying to add a class go here-->
+        </p>
+    </div>
+</div>

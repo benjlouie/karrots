@@ -277,10 +277,11 @@ function mainContentLoader() {
 }
 
 //loads in the mainContent
-function openMainContent_master(element, mainContentFile, sideNavSelection, calendar, menuBar) {
+function openMainContent_master(element, mainContentFile, sideNavSelection, calendar, calendarEventOverlap, menuBar) {
     localStorage.setItem("mainContentFile", mainContentFile);
     localStorage.setItem("sideNavSelection", sideNavSelection);
     localStorage.setItem("mainContentCalendar", calendar);
+    localStorage.setItem("mainContentCalendarEventOverlap", calendarEventOverlap);
     localStorage.setItem("mainContentMenuBar", menuBar);
 
     $("#mainContent").load(localStorage.getItem("mainContentFile"), mainContentLoader);
@@ -290,51 +291,54 @@ function openMainContent_master(element, mainContentFile, sideNavSelection, cale
 
 //Account
 function openMainContent_Account_Summary(element) {
-    openMainContent_master(element, "html/maincontent/account/summary.html", 1, false, false);
+    openMainContent_master(element, "html/maincontent/account/summary.html", 1, false, false, false);
 }
 function openMainContent_Account_Balance(element) {
-    openMainContent_master(element, "html/maincontent/account/balance.html", 2, false, false);
+    openMainContent_master(element, "html/maincontent/account/balance.html", 2, false, false, false);
 }
 function openMainContent_Account_Settings(element) {
-    openMainContent_master(element, "html/maincontent/account/settings.html", 3, false, false);
+    openMainContent_master(element, "html/maincontent/account/settings.html", 3, false, false, false);
 }
 
 //Registration
 function openMainContent_Registration_Status(element) {
-    openMainContent_master(element, "html/maincontent/registration/status.html", 1, false, false);
+    openMainContent_master(element, "html/maincontent/registration/status.html", 1, false, false, false);
 }
 function openMainContent_Registration_Schedule(element) {
-    openMainContent_master(element, "html/maincontent/registration/schedule.html", 2, true, false);
+    openMainContent_master(element, "html/maincontent/registration/schedule.html", 2, true, false, false);
 }
 function openMainContent_Registration_Classes(element) {
-    openMainContent_master(element, "html/maincontent/registration/classes.html", 3, false, false);
+    openMainContent_master(element, "html/maincontent/registration/classes.html", 3, false, false, false);
 }
 
 //Classes
 function openMainContent_Classes_List(element) {
-    openMainContent_master(element, "html/maincontent/classes/list.html", 1, false, false);
+    openMainContent_master(element, "html/maincontent/classes/list.html", 1, false, false, false);
 }
 function openMainContent_Classes_Enrollment(element) {
-    openMainContent_master(element, "html/maincontent/classes/enrollment.html", 2, false, false);
+    openMainContent_master(element, "html/maincontent/classes/enrollment.html", 2, false, false, false);
 }
 function openMainContent_Classes_Grades(element) {
-    openMainContent_master(element, "html/maincontent/classes/grades.html", 3, false, false);
+    openMainContent_master(element, "html/maincontent/classes/grades.html", 3, false, false, false);
 }
 
 //employee
 function openMainContent_Employee_Job(element) {
-    openMainContent_master(element, "html/maincontent/employee/job.html", 1, false, false);
+    openMainContent_master(element, "html/maincontent/employee/job.html", 1, false, false, false);
 }
 function openMainContent_Employee_Timesheet(element) {
-    openMainContent_master(element, "html/maincontent/employee/timesheet.html", 2, false, false);
+    openMainContent_master(element, "html/maincontent/employee/timesheet.html", 2, false, false, false);
 }
 function openMainContent_Employee_Pay(element) {
-    openMainContent_master(element, "html/maincontent/employee/pay.html", 3, false, false);
+    openMainContent_master(element, "html/maincontent/employee/pay.html", 3, false, false, false);
 }
 
 //mockups
 function openMainContent_Mockups_ClassSchedule(element) {
-    openMainContent_master(element, "html/maincontent/mockups/schedule.html", 1, true, true);
+    openMainContent_master(element, "html/maincontent/mockups/schedule.html", 1, true, false, true);
+}
+function openMainContent_Mockups_ManageClasses(element) {
+    openMainContent_master(element, "html/maincontent/mockups/manageClasses.html", 3, true, true, true);
 }
 ////////////////////////////
 
