@@ -167,6 +167,7 @@ function manageClasses_timeListRemove(element) {
 }
 
 function manageClasses_addClass() {
+    resetRevertColors();
     var dayAbbrev = {
         U: 0,
         M: 1,
@@ -302,6 +303,7 @@ function manageClasses_addClass() {
 }
 
 function manageClasses_updateClass() {
+    resetRevertColors();
     //remove selected CRN from classList
     var selectedCrn = localStorage.getItem("mainContentCalendarSelectedCrn");
     delete kClasses[selectedCrn];
@@ -323,6 +325,7 @@ function manageClasses_updateClass() {
 }
 
 function manageClasses_clearSelection() {
+    resetRevertColors();
     //clear selection from localStorage
     localStorage.setItem("mainContentCalendarSelectedCrn", "");
 
@@ -371,6 +374,7 @@ function manageClasses_clearSelection() {
 }
 
 function manageClasses_deleteSelection() {
+    resetRevertColors();
     var selectedCrn = localStorage.getItem("mainContentCalendarSelectedCrn");
     if (selectedCrn == "") {
         return;
@@ -515,7 +519,6 @@ function makeCalendar() {
         eventClick: function (event, jsEvent, view) {
             eventClickHandler(event, jsEvent, view);
         },
-
         //when an event is changed, alter its color
         eventDragStart: function (event, jsEvent, ui, view) {
             eventDragStartHandler(event, jsEvent, ui, view);
@@ -527,6 +530,10 @@ function makeCalendar() {
         eventResize: function (event, delta, revertFunc, jsEvent, ui, view) {
             eventResizeHandler(event, delta, revertFunc, jsEvent, ui, view);
             handleOverlaps();
+        },
+
+        eventOverlap: function (stillEvent, movingEvent) {
+            return eventOverlapHandler(stillEvent, movingEvent);
         },
     });
 
@@ -592,15 +599,28 @@ function highlightSelectedEvents() {
     return foundEvents;
 }
 
-//TODO: use better way, like localStorage eventually
-var kEventDragStartSave = {};
 //saves the original event so it can be used with eventDropHandler
 function eventDragStartHandler(event, jsEvent, ui, view) {
-    //TODO: change this terrible line, just get needed info
-    kEventDragStartSave = JSON.parse(JSON.stringify(event));
+    //manageClasses page
+    if (document.getElementById("mc_manageClasses_input_crn")) {
+        //save only the needed data
+        var startHours = event.start._d.getUTCHours();
+        var startMinutes = event.start._d.getUTCMinutes();
+        startHours = string_pad(startHours, 2);
+        startMinutes = string_pad(startMinutes, 2);
+        var dow = event.dow;
+        var saveData = {
+            dow: dow,
+            startHours: startHours,
+            startMinutes: startMinutes
+        };
+        localStorage.setItem("manageClassesEventDragSave", JSON.stringify(saveData));
+    }
 }
 
+//handles when events are dragged to a new position
 function eventDropHandler(event, delta, revertFunc, jsEvent, ui, view) {
+    resetRevertColors();
     //manageClasses page
     if (document.getElementById("mc_manageClasses_input_crn")) {
         //update time entry in global
@@ -611,25 +631,15 @@ function eventDropHandler(event, delta, revertFunc, jsEvent, ui, view) {
         var endHours = string_pad(event.end._d.getUTCHours(), 2);
         var endMinutes = string_pad(event.end._d.getUTCMinutes(), 2);
         var endTime = endHours + ":" + endMinutes;
-        //get original times
-        var changeHours = delta._data.hours;
-        var changeMinutes = delta._data.minutes;
-
-        var oldStartTime = time_dayChanges(startHours, startMinutes, changeHours, changeMinutes);
-        var oldEndTime = time_dayChanges(endHours, endMinutes, changeHours, changeMinutes);
-
-        var dayChange = delta._data.days + oldStartTime["dayChange"];
-        oldStartTime = string_makeTime(oldStartTime["hours"], oldStartTime["minutes"]);
-        oldEndTime = string_makeTime(oldEndTime["hours"], oldEndTime["minutes"]);
-
-        //get original days
         var newDays = event.dow;
-        var oldDays = [];
-        for (var d = 0; d < newDays.length; d++) {
-            oldDays[d] = newDays[d] + dayChange;
+        for (var i = 0; i < newDays.length; i++) {
+            newDays[i] += delta._days;
         }
 
-        time_dayChanges()
+        //get original times
+        var oldEventData = JSON.parse(localStorage.getItem("manageClassesEventDragSave"));
+        var oldStartTime = oldEventData.startHours + ":" + oldEventData.startMinutes;
+        var oldDays = oldEventData.dow;
 
         //replace old times with new
         var eventCrn = event._id.split("_")[0];
@@ -638,9 +648,9 @@ function eventDropHandler(event, delta, revertFunc, jsEvent, ui, view) {
         var days = curClass.days;
 
         for (var t = 0; t < times.length; t++) {
-            if (oldStartTime == times[t][0] && oldEndTime == times[t][1]) {
-                //original times are equal
-                if (days.length != newDays.length) {
+            if (oldStartTime == times[t][0]) {
+                //original startTime are equal
+                if (days[t].length != oldDays.length) {
                     continue;
                 }
                 var daysEqual = true;
@@ -652,14 +662,107 @@ function eventDropHandler(event, delta, revertFunc, jsEvent, ui, view) {
                 }
 
                 if (daysEqual) {
-                    //found time, replace
-                    times[t] = [startTime, endTime];
-                    days[t] = newDays;
-                    return;
+                    //found time, check for overlaps with same CRN
+                    var overlaps = getOverlappingEvents(eventCrn);
+                    if (overlaps.length > 0 || startTime > endTime) {
+                        //overlaps, revert
+                        revertFunc();
+                        event.dow = copy(oldDays); //IMPORTANT, revertFunc() doesn't correctly reset the dow
+                        //save overlapping events to revert their color on next change
+                        var overlapTable = {};
+                        for (var e = 0; e < overlaps.length; e++) {
+                            var event1 = overlaps[e][0];
+                            var event2 = overlaps[e][1];
+                            overlapTable[event1._id] = true;
+                            overlapTable[event2._id] = true;
+                        }
+                        localStorage.setItem("manageClassesRevertColorEvents", JSON.stringify(overlapTable));
+                    } else {
+                        //no overlaps, set data
+                        times[t] = copy([startTime, endTime]);
+                        days[t] = copy(newDays);
+                    }
+                    break;
                 }
             }
         }
+        
+        //update timeList if applicable
+        var selectedCrn = localStorage.getItem("mainContentCalendarSelectedCrn");
+        if (eventCrn == selectedCrn) {
+            //only show times event crn is currently selected
+            manageClasses_previewSelected_times();
+        }
+        return;
+    }
 
+    //TODO: handle other pages
+}
+
+function eventResizeHandler(event, delta, revertFunc, jsEvent, ui, view) {
+    resetRevertColors();
+    //manageClasses page
+    if (document.getElementById("mc_manageClasses_input_crn")) {
+        //update time entry in global
+
+        var startHours = string_pad(event.start._d.getUTCHours(), 2);
+        var startMinutes = string_pad(event.start._d.getUTCMinutes(), 2);
+        var startTime = startHours + ":" + startMinutes;
+        var endHours = string_pad(event.end._d.getUTCHours(), 2);
+        var endMinutes = string_pad(event.end._d.getUTCMinutes(), 2);
+        var endTime = endHours + ":" + endMinutes;
+        var newDays = event.dow;
+
+        //replace old times with new
+        var eventCrn = event._id.split("_")[0];
+        var curClass = kClasses[eventCrn];
+        var times = curClass.times;
+        var days = curClass.days;
+
+        if (delta._days != 0) {
+            //can't go across a day
+            revertFunc();
+        }
+
+        for (var t = 0; t < times.length; t++) {
+            if (startTime == times[t][0]) {
+                //original startTime are equal
+                if (days[t].length != newDays.length) {
+                    continue;
+                }
+                var daysEqual = true;
+                for (var d = 0; d < days[t].length; d++) {
+                    if (days[t][d] != newDays[d]) {
+                        daysEqual = false;
+                        break;
+                    }
+                }
+
+                if (daysEqual) {
+                    //found time, check for overlaps with same CRN
+                    var overlaps = getOverlappingEvents(eventCrn);
+                    if (overlaps.length > 0) {
+                        //overlaps, or across days, revert
+                        revertFunc();
+
+                        //save overlapping events to revert their color on next change
+                        var overlapTable = {};
+                        for (var e = 0; e < overlaps.length; e++) {
+                            var event1 = overlaps[e][0];
+                            var event2 = overlaps[e][1];
+                            overlapTable[event1._id] = true;
+                            overlapTable[event2._id] = true;
+                        }
+                        localStorage.setItem("manageClassesRevertColorEvents", JSON.stringify(overlapTable));
+                    } else {
+                        //no overlaps, set data
+                        times[t] = copy([startTime, endTime]);
+                        days[t] = copy(newDays);
+                    }
+                    break;
+                }
+            }
+        }
 
         //update timeList if applicable
         var selectedCrn = localStorage.getItem("mainContentCalendarSelectedCrn");
@@ -667,14 +770,37 @@ function eventDropHandler(event, delta, revertFunc, jsEvent, ui, view) {
             //only show times event crn is currently selected
             manageClasses_previewSelected_times();
         }
+        return;
     }
 
-    //TODO: handle other pages
+    //TODO: handle other page
 }
 
-function eventResizeHandler(event, delta, revertFunc, jsEvent, ui, view) {
-    //TODO: implement handler
-    return;
+function eventOverlapHandler(stillEvent, movingEvent) {
+    //manageClasses page
+    if (document.getElementById("mc_manageClasses_input_crn")) {
+        var stillId = stillEvent._id.split("_")[0];
+        var movingId = movingEvent._id.split("_")[0];
+
+        //only allowed to overlap if ids are different
+        return stillId != movingId;
+    }
+
+    //TODO: handle other page
+}
+
+//gets the events that were reset in the last operation (if any) and sets them to the default color
+function resetRevertColors() {
+    var events = JSON.parse(localStorage.getItem("manageClassesRevertColorEvents"));
+    var allEvents = $('#calendar').fullCalendar('clientEvents');
+    for (var i = 0; i < allEvents.length; i++) {
+        if (allEvents[i]._id in events) {
+            allEvents[i].color = '#5f5f5f';
+        }
+    }
+    localStorage.setItem("manageClassesRevertColorEvents", "{}");
+    //rerender events
+    $("#calendar").fullCalendar('renderEvents', events);
 }
 
 //render classes to the calendar
@@ -689,9 +815,11 @@ function eventsInitialRender() {
             classData = kClasses[key];
             //add each time as an event
             for (var t = 0; t < classData.times.length; t++) {
-                var startTime = classData.times[t][0];
-                var endTime = classData.times[t][1];
-                var days = classData.days[t];
+
+                var startTime = copy(classData.times[t][0]);
+                var endTime = copy(classData.times[t][1]);
+                var days = copy(classData.days[t]);
+
                 var event = {
                     id: key + "_" + t, //crn stored as id
                     title: classData.course, //use course name for event title
@@ -771,13 +899,21 @@ function handleOverlaps() {
 //returns every pair of overlapping events
 //ex: [[e1,e2],[e3,e4]]
 //doesn't get every pair, but each overlapped event will apear at least once
-function getOverlappingEvents() {
+//if crn is specified, only checks events with that crn
+function getOverlappingEvents(crn) {
+
     var overlappingEvents = [];
-    var allEvents = $('#calendar').fullCalendar('clientEvents');
+    if (crn === undefined || parseInt(crn) == NaN) {
+        var allEvents = $('#calendar').fullCalendar('clientEvents');
+    } else {
+        var allEvents = $('#calendar').fullCalendar('clientEvents', function (event) {
+            return event._id.split("_")[0] == crn;
+        });
+    }
     var len = allEvents.length;
 
     if (len == 0) {
-        return numOverlaps;
+        return overlappingEvents;
     }
 
     //sort by start time
@@ -812,6 +948,7 @@ function getOverlappingEvents() {
 
     return overlappingEvents;
 }
+
 
 /*//Other//*/
 
@@ -852,42 +989,8 @@ function time_meridianTo24(timeString) {
     return hours + ":" + minutes;
 }
 
-//returns {hours, minutes, dayChange}
-//24-hour format
-//TODO: make it work for change in hours > 24 and minutes >60
-function time_dayChanges(curHour, curMin, chgHour, chgMin) {
-    curHour = parseInt(curHour);
-    curMin = parseInt(curMin);
-    chgHour = parseInt(chgHour);
-    chgMin = parseInt(chgMin);
-
-    curHour -= chgHour;
-    curMin -= chgMin;
-
-    if (curMin < 0) {
-        curMin += 60;
-        curHour -= 1;
-    } else if (curMin >= 60) {
-        curMin -= 60;
-        curHour += 1;
-    }
-    var dayChange = 0;
-    if (curHour < 0) {
-        dayChange = -1;
-        curHour += 24;
-    } else if (curHour >= 24) {
-        dayChange = 1;
-        curHour -= 24;
-    }
-
-
-    return {
-        hours: curHour,
-        minutes: curMin,
-        dayChange: dayChange
-    };
-}
-
+//formats the given hours and minutes into a string
+//ex: hours: 2, minuts: 35 --> "02:35"
 function string_makeTime(hours, minutes) {
     hours = string_pad(hours, 2);
     minutes = string_pad(minutes, 2);
@@ -901,4 +1004,9 @@ function string_pad(num, width, padChar) {
     padChar = padChar || '0';
     num = num + '';
     return num.length >= width ? num : new Array(width - num.length + 1).join(padChar) + num;
+}
+
+//this is terrible
+function copy(obj) {
+    return JSON.parse(JSON.stringify(obj));
 }
