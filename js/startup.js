@@ -50,9 +50,10 @@ function startup_localStorage() {
         ["mainContentCalendarEventOverlap", false],
         ["mainContentCalendarSelectedCrn", ""],
         ["mainContentMenuBar", false],
-        ["manageClassesEventDragSave", "{}"],
-        ["manageClassesRevertColorEvents", "{}"],
-        ["kClasses", ""] //classes saved using JSON and loaded on startup
+        ["manageClasses_eventDragSave", "{}"],
+        ["manageClasses_revertColorEvents", "{}"],
+        ["scheduleRegistration_classes", "[]"],
+        ["kClasses", "{}"] //classes saved using JSON and loaded on startup
     ];
 
     for (var i = 0; i < LSVars.length; i++) {
