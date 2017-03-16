@@ -207,10 +207,13 @@
     border-right-width: 0px;
 }
 
+/*TODO: turn on if decided rows are clickable*/
+/*
 .mc_classList tbody tr:hover td:not(:first-child) {
     background-color: black;
     cursor: default;
 }
+*/
 
 .mc_classList td:first-child {
     padding: 0px 0px 0px 0px;

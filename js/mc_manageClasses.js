@@ -229,8 +229,10 @@ function manageClasses_addClass() {
 
     //add class to global list of classes
     var newClass = {
+        subject: "Computer Science", //TODO: have this changeable
         title: title.value,
         course: course.value,
+        teacher: "TBD",
         hrs: hrs.value,
         seats: seats.value,
         building: building.value,

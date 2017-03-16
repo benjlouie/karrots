@@ -33,7 +33,28 @@ function login() {
 }
 
 function logout() {
-    localStorage.clear();
+    //reset everything except the stored classes
+    localStorage.setItem("loginContentFile", "html/login.html");
+    localStorage.setItem("accountType", "none");
+    localStorage.setItem("topNavDisplay", "hidden");
+    localStorage.setItem("topNavFile", "");
+    localStorage.setItem("topNavSelection", "");
+    localStorage.setItem("sideNavDisplay", "hidden_maximized");
+    localStorage.setItem("sideNavFile", "");
+    localStorage.setItem("sideNavSelection", 1);
+    localStorage.setItem("mainContentFile", "");
+    localStorage.setItem("mainContentCalendar", false);
+    localStorage.setItem("mainContentCalendarEventOverlap", false);
+    localStorage.setItem("mainContentCalendarSelectedCrn", "");
+    localStorage.setItem("mainContentMenuBar", false);
+    localStorage.setItem("manageClasses_eventDragSave", "{}");
+    localStorage.setItem("manageClasses_revertColorEvents", "{}");
+    /*
+    "scheduleRegistration_classes", "[]"
+    "kClasses", "{}"
+    */
+
+    //reload the page
     location.reload();
 }
 

@@ -6,7 +6,8 @@ kClasses = {
     //this also serves as a template for how classes are stored
     //These classes will only be loaded on first startup
     '00000': {
-        section: "none", //like computer science, biology, etc
+        //TODO: need way to store which semester as well
+        subject: "none", //like computer science, biology, etc
         title: "Test Class",
         course: "Test 123",
         teacher: "TBD",
@@ -18,6 +19,7 @@ kClasses = {
         days: [[1, 3],[2]], //days for each time section
     }
 };
+kScheduleRegistration_selectedClasses = {}; //selected classes in schedule/registration page
 
 window.onload = function () {
     //when page loads
@@ -52,7 +54,7 @@ function startup_localStorage() {
         ["mainContentMenuBar", false],
         ["manageClasses_eventDragSave", "{}"],
         ["manageClasses_revertColorEvents", "{}"],
-        ["scheduleRegistration_classes", "[]"],
+        ["scheduleRegistration_selectedClasses", "{}"],
         ["kClasses", "{}"] //classes saved using JSON and loaded on startup
     ];
 
@@ -72,6 +74,7 @@ function startup_contentCalls() {
 }
 
 function startup_loadClasses() {
+    //all classes
     var classesString = localStorage.getItem("kClasses");
     if (classesString == "") {
         //first time, just leave kClasses as is
@@ -81,9 +84,19 @@ function startup_loadClasses() {
     if (kClasses == null) {
         kClasses = {};
     }
+
+    //selected classes CRNs for schedule/Registration page
+    var selectedCrns = localStorage.getItem("scheduleRegistration_selectedClasses")
+    kScheduleRegistration_selectedClasses = JSON.parse(selectedCrns);
+    if (kScheduleRegistration_selectedClasses == null) {
+        kScheduleRegistration_selectedClasses = {};
+    }
 }
 
 function shutdown_saveClasses() {
     var classesString = JSON.stringify(kClasses);
     localStorage.setItem("kClasses", classesString);
+
+    var selectedCrns = JSON.stringify(kScheduleRegistration_selectedClasses);
+    localStorage.setItem("scheduleRegistration_selectedClasses", selectedCrns);
 }

@@ -82,11 +82,10 @@ function eventClickHandler(event, jsevent, view) {
     //manageClasses page
     if (document.getElementById("mc_manageClasses_input_crn")) {
         manageClasses_eventClickHandler(event, jsevent, view);
+        $('#calendar').fullCalendar("rerenderEvents");
     }
 
     //TODO: handle other pages
-
-    $('#calendar').fullCalendar("rerenderEvents");
 }
 
 //saves the original event so it can be used with eventDropHandler
@@ -139,7 +138,10 @@ function eventsInitialRender() {
         manageClasses_eventsInitialRender();
     }
 
-
+    //scheduleRegistration
+    if (document.getElementById("mc_scheduleRegistration_classTable")) {
+        scheduleRegistration_eventsInitialRender();
+    }
 
     //TODO: handle other pages
 }
@@ -322,7 +324,7 @@ function time_meridianTo24(timeString) {
         hours += 12;
     }
 
-    return hours + ":" + minutes;
+    return string_pad(hours, 2) + ":" + string_pad(minutes, 2);
 }
 
 //formats the given hours and minutes into a string
