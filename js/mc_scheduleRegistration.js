@@ -22,8 +22,12 @@ function scheduleRegistration_classListSwitch(element) {
         //remove from global
         delete kScheduleRegistration_selectedClasses[crn];
         //if selected remove that localStorage entry
-        if (localStorage.get("mainContentCalendarSelectedCrn") == crn) {
+        if (localStorage.getItem("mainContentCalendarSelectedCrn") == crn) {
             localStorage.setItem("mainContentCalendarSelectedCrn", "");
+            //disable remove btn
+            var removeBtn = document.getElementById("mc_scheduleRegistration_removeSelectedClassBtn");
+            removeBtn.disabled = true;
+            removeBtn.style.opacity = 0.4;
         }
     } else {
         scheduleRegistration_toggleAddRemovebtn(element, true);
@@ -236,6 +240,36 @@ function scheduleRegistration_eventClickHandler(event, jsevent, view) {
     var removeBtn = document.getElementById("mc_scheduleRegistration_removeSelectedClassBtn");
     removeBtn.disabled = false;
     removeBtn.style.opacity = 1;
+    
+    //expand details in sideList
+    var ul = document.getElementById("mc_scheduleRegistration_selectedClassList");
+    var crnTds = ul.getElementsByClassName("mc_scheduleRegistration_selectedClassListItem_crn");
+    var li;
+    for (var i = 0; i < crnTds.length; i++) {
+        if (crnTds[i].innerHTML == eventCrn) {
+            //found item, remove li from sideList
+            li = html_getFirstAncestorTag(crnTds[i], "li")
+            if (li == null) {
+                //error
+                console.log("couldn't find ancestor li of sideList crn: " + selectedCrn);
+                return;
+            }
+            var a = li.firstChild;
+            mc_sideListDetailToggle(a, true);
+            break;
+        }
+    }
+
+    //highlight only selected <li><a>
+    var sideItems = ul.children; 
+    for (var i = 0; i < sideItems.length; i++) {
+        sideItems[i].firstChild.style.backgroundColor = "#5f5f5f"; //dark grey
+        sideItems[i].firstChild.style.color = "#f1f1f1"; //light grey
+    }
+    if (li) {
+        li.firstChild.style.backgroundColor = "#e6e600";//light yellow
+        li.firstChild.style.color = "black";
+    }
 }
 
 //renders the initial classes
@@ -245,6 +279,11 @@ function scheduleRegistration_eventsInitialRender() {
 
     var events = [];
     for (var crn in selectedClasses) {
+        if (!(crn in kClasses)) {
+            //no longer in the global, remove it
+            delete selectedClasses[crn];
+            continue;
+        }
         var classData = kClasses[crn];
         for (var t = 0; t < classData.times.length; t++) {
             //don't need to copy anything b/c classes shouldn't be moving around
@@ -265,9 +304,7 @@ function scheduleRegistration_eventsInitialRender() {
     }
     $("#calendar").fullCalendar('renderEvents', events);
     
-    //TODO: move this somewhere better
-    //should be thing in navigation.js
-    //it actually might be fine here, this will always be the last thing loaded
+    //TODO: replace this section with a loading function that is called from navigation.js
     var currentSubject = localStorage.getItem("scheduleRegistration_currentSubject");
     scheduleRegistration_fillClassList(currentSubject);
     scheduleRegistration_fillSelectedClassList();

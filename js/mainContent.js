@@ -3,20 +3,42 @@
 //TODO: ensure above
 
 //takes in the <a> that was clicked and toggles its associated div 
-function mc_sideListDetailToggle(element) {
+//optional: expand, true/false gives expanded/closed respectively
+//TODO: remake this function so it's less convoluted
+function mc_sideListDetailToggle(element, expand) {
     var toggleIcon = element.getElementsByClassName("mc_sideListDetailToggleIcon")[0];
     var liChildren = element.parentNode.children;
     var details = liChildren[1]; //div
 
-    if (toggleIcon.innerHTML == "+") {
-        var iconText = document.createTextNode("-");
+    if (expand == undefined) {
+        //toggle
+        if (toggleIcon.innerHTML == "+") {
+            var iconText = document.createTextNode("-");
+            expand = true;
+        } else {
+            var iconText = document.createTextNode("+");
+            expand = false;
+        }
     } else {
-        var iconText = document.createTextNode("+");
+        //ensure we want to call the toggle
+        if (toggleIcon.innerHTML == "+") {
+            var iconText = document.createTextNode("-");
+            if (!expand) {
+                //already closed
+                return;
+            }
+        } else {
+            var iconText = document.createTextNode("+");
+            if (expand) {
+                //already expanded
+                return;
+            }
+        }
     }
+
     toggleIcon.removeChild(toggleIcon.firstChild);
     toggleIcon.appendChild(iconText);
     $(details).slideToggle(150);
-
 }
 
 
