@@ -55,6 +55,7 @@ function startup_localStorage() {
         ["manageClasses_eventDragSave", "{}"],
         ["manageClasses_revertColorEvents", "{}"],
         ["scheduleRegistration_selectedClasses", "{}"],
+        ["scheduleRegistration_currentSubject", "Computer Science"],
         ["kClasses", "{}"] //classes saved using JSON and loaded on startup
     ];
 

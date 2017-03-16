@@ -1,5 +1,4 @@
-﻿//TODO: add remove button to the menuBar when a class is selected on the calendar
-////Schedule specific////
+﻿////Schedule specific////
 function scheduleRegistration_classListSwitch(element) {
     if (event) {
         event.cancelBubble = true;
@@ -9,23 +8,25 @@ function scheduleRegistration_classListSwitch(element) {
         }
     }
 
-    //TODO: put this in the crn if checks below
-    if (element.innerHTML == "Add") {
-        element.innerHTML = "Remove";
-        element.style.backgroundColor = "#74dd8f";
-        element.style.color = "black";
-    } else {
-        element.innerHTML = "Add";
-        element.style.backgroundColor = "#5f5f5f";
-        element.style.color = "#babab2";
-    }
-
     var crnTd = element.nextElementSibling;
     var crn = copy(crnTd.innerHTML); //copy just in case
     //only add if new
     if (crn in kScheduleRegistration_selectedClasses) {
-        //TODO: already added, delete it from stuff
+        //already added, delete it from calendar and selectedClassList
+        scheduleRegistration_toggleAddRemovebtn(element, false);
+        scheduleRegistration_removeSideListEntry(crn);
+        $("#calendar").fullCalendar('removeEvents', function (event) {
+            var eventCrn = event._id.split("_")[0];
+            return crn == eventCrn;
+        });
+        //remove from global
+        delete kScheduleRegistration_selectedClasses[crn];
+        //if selected remove that localStorage entry
+        if (localStorage.get("mainContentCalendarSelectedCrn") == crn) {
+            localStorage.setItem("mainContentCalendarSelectedCrn", "");
+        }
     } else {
+        scheduleRegistration_toggleAddRemovebtn(element, true);
         //add class to calendar
         var classData = kClasses[crn];
         var events = [];
@@ -54,6 +55,35 @@ function scheduleRegistration_classListSwitch(element) {
         var li = scheduleRegistration_createSelectedClassEntry(crn);
         ul.appendChild(li);
     }
+
+    //check for overlaps
+    handleOverlaps();
+    $("#calendar").fullCalendar('rerenderEvents');
+}
+
+//toggles the tdElement
+//optional: on is true or false, sets tdElement to remov/add respectively
+function scheduleRegistration_toggleAddRemovebtn(tdElement, on) {
+    if (on === undefined) {
+        //toggle
+        if (element.innerHTML == "Add") {
+            on = false;
+        } else {
+            on = true;
+        }
+    }
+
+    if (on) {
+        //set to remove
+        tdElement.innerHTML = "Remove";
+        tdElement.style.backgroundColor = "#74dd8f";
+        tdElement.style.color = "black";
+    } else {
+        //set to Add
+        tdElement.innerHTML = "Add";
+        tdElement.style.backgroundColor = "#5f5f5f";
+        tdElement.style.color = "#babab2";
+    }
 }
 
 function scheduleRegistration_classListRowClick(element) {
@@ -74,6 +104,142 @@ function scheduleRegistration_classListRowClick(element) {
     }
 }
 
+//removes the class with the given crn
+//in no crn is given, uses the currently selected class if available
+function scheduleRegistration_removeClass(crn) {
+    var selectedCrn;
+    if (crn === undefined) {
+        //get from selected class
+        selectedCrn = localStorage.getItem("mainContentCalendarSelectedCrn");
+        if (selectedCrn == "") {
+            //couldn't get crn, exit
+            return;
+        }
+
+        //disable remove btn
+        var removeBtn = document.getElementById("mc_scheduleRegistration_removeSelectedClassBtn");
+        removeBtn.disabled = true;
+        removeBtn.style.opacity = 0.4;
+    } else {
+        selectedCrn = crn;
+    }
+
+    //remove from global
+    delete kScheduleRegistration_selectedClasses[selectedCrn];
+    //remove sideList entry
+    scheduleRegistration_removeSideListEntry(selectedCrn);
+    //deselect classList entry
+    scheduleRegistration_deselectClassListEntry(selectedCrn);
+    //remove from calendar
+    $("#calendar").fullCalendar('removeEvents', function (event) {
+        var eventCrn = event._id.split("_")[0];
+        return selectedCrn == eventCrn;
+    });
+
+    //check for overlaps and rerender
+    handleOverlaps();
+    $("#calendar").fullCalendar('rerenderEvents');
+
+    //clear selected crn
+    localStorage.setItem("mainContentCalendarSelectedCrn", "");
+    var calendar = $('#calendar');
+    var events = calendar.fullCalendar('clientEvents');
+    for (var i = 0; i < events.length; i++) {
+        events[i].borderColor = "black";
+    }
+    calendar.fullCalendar("rerenderEvents");
+}
+
+//removes the class with the given crn
+//in no crn is given, uses the currently selected class if available
+function scheduleRegistration_removeSideListEntry(crn) {
+    var selectedCrn;
+    if (crn === undefined) {
+        //get from selected class
+        selectedCrn = localStorage.getItem("mainContentCalendarSelectedCrn");
+        if (selectedCrn == "") {
+            //couldn't get crn, exit
+            return;
+        }
+    } else {
+        selectedCrn = crn;
+    }
+
+    //remove from side list
+    var ul = document.getElementById("mc_scheduleRegistration_selectedClassList");
+    var crnTds = ul.getElementsByClassName("mc_scheduleRegistration_selectedClassListItem_crn");
+    for (var i = 0; i < crnTds.length; i++) {
+        if (crnTds[i].innerHTML == selectedCrn) {
+            //found item, remove li from sideList
+            var li = html_getFirstAncestorTag(crnTds[i], "li")
+            if (li == null) {
+                //error
+                console.log("couldn't find ancestor li of sideList crn: " + selectedCrn);
+                return;
+            }
+
+            ul.removeChild(li);
+            return;
+        }
+    }
+}
+
+//deselects the class with the given crn
+//in no crn is given, uses the currently selected class if available
+function scheduleRegistration_deselectClassListEntry(crn) {
+    var selectedCrn;
+    if (crn === undefined) {
+        //get from selected class
+        selectedCrn = localStorage.getItem("mainContentCalendarSelectedCrn");
+        if (selectedCrn == "") {
+            //couldn't get crn, exit
+            return;
+        }
+    } else {
+        selectedCrn = crn;
+    }
+
+    //ensure that subject is currently being displayed in classList
+    var currentSubject = localStorage.getItem("scheduleRegistration_currentSubject");
+    var classData = kClasses[selectedCrn];
+    if (classData.subject != currentSubject) {
+        //classList is in different subject, do nothing
+        return;
+    }
+
+    var table = document.getElementById("mc_scheduleRegistration_classTable");
+    var tbody = table.getElementsByTagName("tbody")[0];
+    var crnTds = tbody.getElementsByClassName("mc_scheduleRegistration_classListItem_crn");
+    for (var i = 0; i < crnTds.length; i++) {
+        if (crnTds[i].innerHTML == selectedCrn) {
+            //found crn, get tr ancestor
+            var tr = html_getFirstAncestorTag(crnTds[i], "tr");
+            if (tr == null) {
+                //error
+                console.log("couldn't find ancestor tr of classList crn: " + selectedCrn);
+                return;
+            }
+            //toggle add/remove btn
+            var td = tr.getElementsByClassName("mc_classList_addRemoveSwitch")[0];
+            scheduleRegistration_toggleAddRemovebtn(td, false);
+        }
+    }
+}
+
+function scheduleRegistration_eventClickHandler(event, jsevent, view) {
+    var eventCrn = event._id.split("_")[0];
+    localStorage.setItem("mainContentCalendarSelectedCrn", eventCrn);
+    highlightSelectedEvents();
+    $('#calendar').fullCalendar('rerenderEvents');
+
+    //set remove btn as clickable
+    var removeBtn = document.getElementById("mc_scheduleRegistration_removeSelectedClassBtn");
+    removeBtn.disabled = false;
+    removeBtn.style.opacity = 1;
+}
+
+//renders the initial classes
+//also does other loading for this page currently
 function scheduleRegistration_eventsInitialRender() {
     var selectedClasses = kScheduleRegistration_selectedClasses;
 
@@ -98,17 +264,16 @@ function scheduleRegistration_eventsInitialRender() {
         }
     }
     $("#calendar").fullCalendar('renderEvents', events);
-
-    //TODO: fill selectedClasses sideList
-
+    
     //TODO: move this somewhere better
     //should be thing in navigation.js
-    scheduleRegistration_fillClassList("Computer Science"); //"Computer Science"
+    //it actually might be fine here, this will always be the last thing loaded
+    var currentSubject = localStorage.getItem("scheduleRegistration_currentSubject");
+    scheduleRegistration_fillClassList(currentSubject);
     scheduleRegistration_fillSelectedClassList();
+    handleOverlaps();
+    $("#calendar").fullCalendar('rerenderEvents');
 }
-
-//TODO: funciton that changes the add/remove buttons based on the currently selected classes
-//used when first loading the classList
 
 function scheduleRegistration_fillSelectedClassList() {
     var selectedClasses = kScheduleRegistration_selectedClasses;
@@ -136,7 +301,11 @@ function scheduleRegistration_fillClassList(subject) {
     for (var key in kClasses) {
         var curClass = kClasses[key];
         if (curClass.subject == subject) {
-            var tr = scheduleRegistration_createClassListEntry(key);
+            var selected = false;
+            if (key in kScheduleRegistration_selectedClasses) {
+                selected = true;
+            }
+            var tr = scheduleRegistration_createClassListEntry(key, selected);
             tbody.appendChild(tr);
             tableEmpty = false
         }
@@ -156,7 +325,9 @@ function scheduleRegistration_fillClassList(subject) {
     }
 }
 
-function scheduleRegistration_createClassListEntry(crn) {
+//create classList entry based on crn
+//if selected is true, changes the add/remove btn
+function scheduleRegistration_createClassListEntry(crn, selected) {
     var dayAbbrev = {
         0: 'U',
         1: 'M',
@@ -173,8 +344,17 @@ function scheduleRegistration_createClassListEntry(crn) {
     //tr.onclick = function () { scheduleRegistration_classListRowClick(this) };
 
     //add/rem button
+    var text;
     var td = document.createElement("td");
-    var text = document.createTextNode("Add");
+    if (selected) {
+        text = document.createTextNode("Remove");
+        td.style.backgroundColor = "#74dd8f";
+        td.style.color = "black";
+    } else {
+        text = document.createTextNode("Add");
+        td.style.backgroundColor = "#5f5f5f";
+        td.style.color = "#babab2";
+    }
     td.appendChild(text);
     td.className = "mc_classList_addRemoveSwitch";
     td.onclick = function () { scheduleRegistration_classListSwitch(this) };
@@ -182,6 +362,7 @@ function scheduleRegistration_createClassListEntry(crn) {
 
     //crn
     td = document.createElement("td");
+    td.className = "mc_scheduleRegistration_classListItem_crn";
     text = document.createTextNode(crn);
     td.appendChild(text);
     tr.appendChild(td);
@@ -388,6 +569,7 @@ function scheduleRegistration_createSelectedClassEntry(crn) {
     tr = document.createElement("tr");
     td = document.createElement("td");
     td.colSpan = 2;
+    td.className = "mc_scheduleRegistration_selectedClassListItem_crn";
     text = document.createTextNode(crn);
     td.appendChild(text);
     tr.appendChild(td);

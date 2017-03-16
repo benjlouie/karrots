@@ -169,6 +169,9 @@
     border:solid;
     border-width: 0px 0px 2px 0px;
 }
+#mc_scheduleRegistration_removeSelectedClassBtn {
+    opacity: 0.4;
+}
 
 .mc_classListMenu {
     clear: left;

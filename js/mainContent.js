@@ -85,6 +85,11 @@ function eventClickHandler(event, jsevent, view) {
         $('#calendar').fullCalendar("rerenderEvents");
     }
 
+    //scheduleRegistration
+    if (document.getElementById("mc_scheduleRegistration_classTable")) {
+        scheduleRegistration_eventClickHandler(event, jsevent, view);
+    }
+
     //TODO: handle other pages
 }
 
@@ -347,4 +352,18 @@ function string_pad(num, width, padChar) {
 //this is terrible
 function copy(obj) {
     return JSON.parse(JSON.stringify(obj));
+}
+
+//gets the first ancestor of startNode that is the given ancestorTag
+function html_getFirstAncestorTag(startNode, ancestorTag) {
+    ancestorTag = ancestorTag.toUpperCase();
+    var cur = startNode.parentNode;
+    while (cur) {
+        if (cur.tagName == ancestorTag) {
+            return cur;
+        }
+        cur = cur.parentNode;
+    }
+
+    return null;
 }
