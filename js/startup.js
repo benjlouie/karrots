@@ -149,13 +149,12 @@ function startup_contentCalls() {
 function startup_loadClasses() {
     //all classes
     var classesString = localStorage.getItem("kClasses");
-    if (classesString == "") {
-        //first time, just leave kClasses as is
-        return;
-    }
-    kClasses = JSON.parse(classesString); //set global classes
-    if (kClasses == null) {
-        kClasses = {};
+    if (classesString != "") {
+        // not first load, get kClasses from localStorage
+        kClasses = JSON.parse(classesString); //set global classes
+        if (kClasses == null) {
+            kClasses = {};
+        }
     }
 
     //selected classes CRNs for schedule/Registration page
