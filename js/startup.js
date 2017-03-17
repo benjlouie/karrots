@@ -90,7 +90,6 @@ kClasses = {
         times: [["14:00", "15:15"], ["15:30", "18:30"]],
         days: [[2, 4], [4]],
     }
-    }
 };
 kScheduleRegistration_selectedClasses = {}; //selected classes in schedule/registration page
 
@@ -129,7 +128,7 @@ function startup_localStorage() {
         ["manageClasses_revertColorEvents", "{}"],
         ["scheduleRegistration_selectedClasses", "{}"],
         ["scheduleRegistration_currentSubject", "Computer Science"],
-        ["kClasses", "{}"] //classes saved using JSON and loaded on startup
+        ["kClasses", ""] //classes saved using JSON and loaded on startup
     ];
 
     for (var i = 0; i < LSVars.length; i++) {
