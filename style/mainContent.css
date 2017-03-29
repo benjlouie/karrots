@@ -13,6 +13,7 @@
 /*calendar overrides*/
 .calendarEvent_moreBorder {
     border-width: 2px !important;
+	cursor:pointer;
 }
 
 /* all styles within mainContent should start with 'mc_' */
@@ -134,7 +135,6 @@
 }
 .mc_dropdownItem a:hover {
     background-color: black;
-    cursor: pointer;
 }
 
 
@@ -191,9 +191,6 @@
     margin-bottom: 1em;
     border-collapse: collapse;
     border-width: 0px;
-}
-.mc_classList thead th:not(:first-child) {
-    cursor: pointer;
 }
 .mc_classList tbody {
     overflow-y: scroll;
@@ -374,4 +371,21 @@
     border-color: #990000;
 
     transition: 1s;
+}
+
+
+/*assignprofessors*/
+#mc_assingProfessors_section{
+	width:100%;
+	display: flex;
+	flex-direction: rows;
+}
+
+#mc_assingProfessors_section > div:first-child{
+	width:25%;
+}
+
+#mc_assingProfessors_section > div:last-child {
+	display: flex;
+	flex-direction: column;
 }
