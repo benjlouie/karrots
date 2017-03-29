@@ -134,6 +134,7 @@
 }
 .mc_dropdownItem a:hover {
     background-color: black;
+    cursor: pointer;
 }
 
 

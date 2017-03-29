@@ -65,6 +65,12 @@ function scheduleRegistration_classListSwitch(element) {
     $("#calendar").fullCalendar('rerenderEvents');
 }
 
+//sets subject and classList based on selection
+function scheduleRegistration_subjectOnclick(element) {
+    localStorage.setItem("scheduleRegistration_currentSubject", element.innerText);
+    scheduleRegistration_initClassList();
+}
+
 //sorts the classList by the selected column
 function scheduleRegistration_classListColClick(sortAttribute) {
     var subject = localStorage.getItem("scheduleRegistration_currentSubject");
@@ -333,11 +339,33 @@ function scheduleRegistration_eventsInitialRender() {
     
     //TODO: replace this section with a loading function that is called from navigation.js
 
-    //TODO: load subjects into dropdown
+    scheduleRegistration_fillSubjectDropdown()
     scheduleRegistration_initClassList();
     scheduleRegistration_fillSelectedClassList();
     handleOverlaps();
     $("#calendar").fullCalendar('rerenderEvents');
+}
+
+function scheduleRegistration_fillSubjectDropdown() {
+    var ul = document.getElementById("mc_scheduleRegistration_subjectDropdown");
+    //empty the ul
+    while (ul.firstChild) {
+        ul.removeChild(ul.firstChild);
+    }
+
+    //fill ul with each subject
+    for (var subject in kSubjects) {
+        var li = document.createElement('li');
+        li.className = 'mc_dropdownItem';
+        var a = document.createElement('a');
+        a.onclick = function () {
+            scheduleRegistration_subjectOnclick(this);
+        };
+        var text = document.createTextNode(subject);
+        a.appendChild(text);
+        li.appendChild(a);
+        ul.appendChild(li);
+    }
 }
 
 function scheduleRegistration_fillSelectedClassList() {

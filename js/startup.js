@@ -76,6 +76,18 @@ kClasses = {
         room: "203",
         times: [["14:00", "15:15"], ["15:30", "18:30"]],
         days: [[2, 4], [4]],
+    },
+    '62038': {
+        subject: "Chemistry",
+        title: "General Chemistry I",
+        course: "CHEM 121-01",
+        teacher: "Praveen Patidar",
+        hrs: 3,
+        seats: 70,
+        building: "WORKC",
+        room: "101",
+        times: [["08:00", "08:50"]],
+        days: [[1, 3, 5]],
     }
 };
 kSubjects = {}; //for getting classes by subject
