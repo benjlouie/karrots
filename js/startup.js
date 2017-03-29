@@ -5,19 +5,6 @@
 kClasses = {
     //this also serves as a template for how classes are stored
     //These classes will only be loaded on first startup
-    '00000': {
-        //TODO: need way to store which semester as well
-        subject: "none", //like computer science, biology, etc
-        title: "Test Class",
-        course: "Test 123",
-        teacher: "TBD",
-        hrs: 3,
-        seats: 99,
-        building: "test building",
-        room: "test room",
-        times: [["11:00", "12:15"],["16:00","17:00"]], //times: [start, end]
-        days: [[1, 3],[2]], //days for each time section
-    },
     '62729': {
         subject: "Computer Science",
         title: "Intro to C Programming",
@@ -27,8 +14,8 @@ kClasses = {
         seats: 58,
         building: "CRAMER",
         room: "203",
-        times: [["09:00", "10:50"]],
-        days: [[1, 3, 5]],
+        times: [["09:00", "10:50"]], //times: [start, end]
+        days: [[1, 3, 5]], //days for each time section
     },
     '62651': {
         subject: "Computer Science",
@@ -89,9 +76,24 @@ kClasses = {
         room: "203",
         times: [["14:00", "15:15"], ["15:30", "18:30"]],
         days: [[2, 4], [4]],
+    },
+    '62038': {
+        subject: "Chemistry",
+        title: "General Chemistry I",
+        course: "CHEM 121-01",
+        teacher: "Praveen Patidar",
+        hrs: 3,
+        seats: 70,
+        building: "WORKC",
+        room: "101",
+        times: [["08:00", "08:50"]],
+        days: [[1, 3, 5]],
     }
 };
+kSubjects = {}; //for getting classes by subject
+
 kScheduleRegistration_selectedClasses = {}; //selected classes in schedule/registration page
+kScheduleRegistration_subjectClasses = []; //classes currently in the classList
 
 window.onload = function () {
     //when page loads
@@ -129,6 +131,8 @@ function startup_localStorage() {
         ["manageClasses_currentSubject","Computer Science"],
         ["scheduleRegistration_selectedClasses", "{}"],
         ["scheduleRegistration_currentSubject", "Computer Science"],
+        ["scheduleRegistration_subjectClasses", "[]"], //sortable array of classes currently being shown
+        ["scheduleRegistration_sortAttribute", "crn"], //what the class list is sorted by (crn by default)
         ["kClasses", ""] //classes saved using JSON and loaded on startup
     ];
 
@@ -156,6 +160,16 @@ function startup_loadClasses() {
         if (kClasses == null) {
             kClasses = {};
         }
+    }
+
+    //load class subjects
+    for (key in kClasses) {
+        var subject = kClasses[key].subject;
+        if (!(subject in kSubjects)) {
+            //start array of CRNs for new subject
+            kSubjects[subject] = [];
+        }
+        kSubjects[subject].push(key); //append crn to that subject
     }
 
     //selected classes CRNs for schedule/Registration page
