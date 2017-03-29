@@ -65,6 +65,33 @@ function scheduleRegistration_classListSwitch(element) {
     $("#calendar").fullCalendar('rerenderEvents');
 }
 
+//sorts the classList by the selected column
+function scheduleRegistration_classListColClick(sortAttribute) {
+    var subject = localStorage.getItem("scheduleRegistration_currentSubject");
+    var oldSortAttribute = localStorage.getItem("scheduleRegistration_sortAttribute");
+
+    //get the classes in the selected subject
+    if (subject in kSubjects) {
+        kScheduleRegistration_subjectClasses = kSubjects[subject];
+    } else {
+        kScheduleRegistration_subjectClasses = [];
+    }
+
+    //sort by new column or reverse order of current sort attribute
+    if (oldSortAttribute == sortAttribute) {
+        //same attribute, simply reverse the classes
+        kScheduleRegistration_subjectClasses.reverse();
+    } else {
+        //sort by attribute
+        localStorage.setItem("scheduleRegistration_sortAttribute", sortAttribute);
+        var sortFunc = scheduleRegistration_getSortFunc(sortAttribute);
+        kScheduleRegistration_subjectClasses.sort(sortFunc);
+    }
+    
+    //put sorted classes into the list
+    scheduleRegistration_fillClassList();
+}
+
 //toggles the tdElement
 //optional: on is true or false, sets tdElement to remov/add respectively
 function scheduleRegistration_toggleAddRemovebtn(tdElement, on) {
@@ -305,8 +332,9 @@ function scheduleRegistration_eventsInitialRender() {
     $("#calendar").fullCalendar('renderEvents', events);
     
     //TODO: replace this section with a loading function that is called from navigation.js
-    var currentSubject = localStorage.getItem("scheduleRegistration_currentSubject");
-    scheduleRegistration_fillClassList(currentSubject);
+
+    //TODO: load subjects into dropdown
+    scheduleRegistration_initClassList();
     scheduleRegistration_fillSelectedClassList();
     handleOverlaps();
     $("#calendar").fullCalendar('rerenderEvents');
@@ -321,10 +349,26 @@ function scheduleRegistration_fillSelectedClassList() {
     }
 }
 
-function scheduleRegistration_fillClassList(subject) {
-    //TODO: have global list of CRNs that hold the current subject classes
-    //load from that list here
-    //will allow for sorting by arbitrary columns
+function scheduleRegistration_initClassList() {
+    var subject = localStorage.getItem("scheduleRegistration_currentSubject");
+    var sortAttribute = localStorage.getItem("scheduleRegistration_sortAttribute");
+    var sortFunc = scheduleRegistration_getSortFunc(sortAttribute);
+
+    //sort classes appropriately
+    if (subject in kSubjects) {
+        kScheduleRegistration_subjectClasses = kSubjects[subject]; //classes in that subject
+    } else {
+        kScheduleRegistration_subjectClasses = [];
+    }
+    kScheduleRegistration_subjectClasses.sort(sortFunc);
+
+    //put classes into the list
+    scheduleRegistration_fillClassList();
+}
+
+//fills the classList from kScheduleRegistration_subjectClasses in their given order
+function scheduleRegistration_fillClassList() {
+    var subject = localStorage.getItem("scheduleRegistration_currentSubject");
     var classTable = document.getElementById("mc_scheduleRegistration_classTable");
     var tbody = classTable.getElementsByTagName("tbody")[0];
 
@@ -334,31 +378,98 @@ function scheduleRegistration_fillClassList(subject) {
     }
 
     //add the classes
-    var tableEmpty = true;
-    for (var key in kClasses) {
-        var curClass = kClasses[key];
-        if (curClass.subject == subject) {
-            var selected = false;
-            if (key in kScheduleRegistration_selectedClasses) {
-                selected = true;
-            }
-            var tr = scheduleRegistration_createClassListEntry(key, selected);
-            tbody.appendChild(tr);
-            tableEmpty = false
+    for (var i = 0; i < kScheduleRegistration_subjectClasses.length; i++) {
+        var curCrn = kScheduleRegistration_subjectClasses[i];
+
+        var selected = false;
+        if (curCrn in kScheduleRegistration_selectedClasses) {
+            selected = true;
         }
+        var tr = scheduleRegistration_createClassListEntry(curCrn, selected);
+        tbody.appendChild(tr);
+        tableEmpty = false
     }
 
     //if no classes, add a message that there are no classes
-    if (tableEmpty) {
+    if (kScheduleRegistration_subjectClasses.length == 0) {
         var tr = document.createElement("tr");
-        //var td = document.createElement("td");
-        //td.colSpan = 12;
+        var td = document.createElement("td");
         var text = document.createTextNode("No Classes in " + subject);
-        //td.appendChild(text);
-        //tr.appendChild(td);
-        tr.appendChild(text);
-        tr.style.textAlign = "center";
+        td.colSpan = 12;
+        td.appendChild(text);
+        td.style.textAlign = "center";
+        tr.appendChild(td);
         tbody.appendChild(tr);
+    }
+}
+
+function scheduleRegistration_getSortFunc(sortAttribute) {
+    //get sorting function
+    switch (sortAttribute) {
+        case 'course':
+            return function (a, b) {
+                a = kClasses[a];
+                b = kClasses[b];
+                return a.course.localeCompare(b.course);
+            };
+        case 'title':
+            return function (a, b) {
+                a = kClasses[a];
+                b = kClasses[b];
+                return a.title.localeCompare(b.title);
+            };
+        case 'time':
+        case 'times':
+            return function (a, b) {
+                a = kClasses[a];
+                b = kClasses[b];
+                //only compare startTime of first time
+                return a.times[0][0].localeCompare(b.times[0][0]);
+            };
+        case 'day':
+        case 'days':
+            return function (a, b) {
+                a = kClasses[a];
+                b = kClasses[b];
+                //only compare first day of first time
+                return a.days[0][0] - b.days[0][0];
+            };
+        case 'teacher':
+        case 'instructor':
+            return function (a, b) {
+                a = kClasses[a];
+                b = kClasses[b];
+                return a.teacher.localeCompare(b.teacher);
+            };
+        case 'building':
+        case 'location':
+            return function (a, b) {
+                a = kClasses[a];
+                b = kClasses[b];
+                var locA = a.building + " " + a.room;
+                var locB = b.building + " " + b.room;
+                return locA.localeCompare(locB);
+            };
+        case 'hrs':
+            return function (a, b) {
+                a = kClasses[a];
+                b = kClasses[b];
+                return a.hrs - b.hrs;
+            };
+            //TODO: need backend for limit and enroll
+        case 'limit':
+        case 'enroll':
+        case 'seats':
+            return function (a, b) {
+                a = kClasses[a];
+                b = kClasses[b];
+                return a.seats - b.seats;
+            };
+        case 'crn':
+        default:
+            return function (a, b) {
+                return a.localeCompare(b);
+            };
     }
 }
 

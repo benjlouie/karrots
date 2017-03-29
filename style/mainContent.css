@@ -191,6 +191,9 @@
     border-collapse: collapse;
     border-width: 0px;
 }
+.mc_classList thead th:not(:first-child) {
+    cursor: pointer;
+}
 .mc_classList tbody {
     overflow-y: scroll;
 }
