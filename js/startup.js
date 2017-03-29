@@ -128,6 +128,7 @@ function startup_localStorage() {
         ["mainContentMenuBar", false],
         ["manageClasses_eventDragSave", "{}"],
         ["manageClasses_revertColorEvents", "{}"],
+        ["manageClasses_currentSubject","Computer Science"],
         ["scheduleRegistration_selectedClasses", "{}"],
         ["scheduleRegistration_currentSubject", "Computer Science"],
         ["scheduleRegistration_subjectClasses", "[]"], //sortable array of classes currently being shown

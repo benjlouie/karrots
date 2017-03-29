@@ -1,4 +1,21 @@
 ﻿////ManageClasses Specific////
+
+
+//sets subject and classList based on selection
+function manageClasses_subjectOnclick(element) {
+    var subject = element.innerText;
+    var oldSubject = localStorage.getItem("manageClasses_currentSubject");
+    if (oldSubject == subject) {
+        //no chenge don't do anything
+        return;
+    }
+    
+    //load the new subject's classes
+    localStorage.setItem("manageClasses_currentSubject", element.innerText);
+    //load classes to calendar based on subject
+    manageClasses_loadSubjectEvents();
+}
+
 function manageClasses_addTime(element) {
     var startTime = document.getElementById("mc_manageClasses_timeStart");
     var endTime = document.getElementById("mc_manageClasses_timeEnd");
@@ -119,6 +136,7 @@ function manageClasses_addClass() {
         F: 5,
         S: 6
     };
+    var subject = localStorage.getItem("manageClasses_currentSubject");
     var crn = document.getElementById("mc_manageClasses_input_crn");
     var title = document.getElementById("mc_manageClasses_input_title");
     var course = document.getElementById("mc_manageClasses_input_course");
@@ -229,7 +247,7 @@ function manageClasses_addClass() {
 
     //add class to global list of classes
     var newClass = {
-        subject: "Computer Science", //TODO: have this changeable
+        subject: subject,
         title: title.value,
         course: course.value,
         teacher: "TBD",
@@ -240,7 +258,10 @@ function manageClasses_addClass() {
         times: classTimes, //times: [start, end]
         days: classDays, //days for each time section
     };
+
+    //add to global classes and subject lists
     kClasses[crn.value] = newClass;
+    kSubjects[subject].push(crn.value);
 
     //render events on calendar
     $("#calendar").fullCalendar('renderEvents', events);
@@ -635,10 +656,58 @@ function manageClasses_eventOverlapHandler(stillEvent, movingEvent) {
     return stillId != movingId;
 }
 
+//performs the initial rendering of events to the calendar
+//does any other necessary calls to load the page
 function manageClasses_eventsInitialRender() {
+    //populate subject dropdown
+    manageClasses_fillSubjectDropdown();
+    //load events based on subject
+    manageClasses_loadSubjectEvents();
+}
+
+//popoulate subject dropdown with the available subjects
+function manageClasses_fillSubjectDropdown() {
+    var ul = document.getElementById("mc_manageClasses_subjectDropdown");
+    //empty the ul
+    while (ul.firstChild) {
+        ul.removeChild(ul.firstChild);
+    }
+
+    //fill ul with each subject
+    for (var subject in kSubjects) {
+        var li = document.createElement('li');
+        li.className = 'mc_dropdownItem';
+        var a = document.createElement('a');
+        a.onclick = function () {
+            manageClasses_subjectOnclick(this);
+        };
+        var text = document.createTextNode(subject);
+        a.appendChild(text);
+        li.appendChild(a);
+        ul.appendChild(li);
+    }
+}
+
+//renders classes from the current subject (localstorage) onto the calendar
+function manageClasses_loadSubjectEvents() {
+    var subject = localStorage.getItem("manageClasses_currentSubject");
+    var subjectClasses = kSubjects[subject];
+
+    //clear selected crn
+    manageClasses_clearSelection();
+
+    //load subjectText in menuBar
+    var subjectText = document.getElementById("mc_manageClasses_subjectText");
+    subjectText.innerText = subject;
+
+    var calendar = $("#calendar");
+    //clear old events
+    calendar.fullCalendar('removeEvents');
+
     var events = [];
-    for (key in kClasses) {
-        classData = kClasses[key];
+    for (var i = 0; i < subjectClasses.length; i++) {
+        var curCrn = subjectClasses[i];
+        var classData = kClasses[curCrn];
         //add each time as an event
         for (var t = 0; t < classData.times.length; t++) {
 
@@ -647,7 +716,7 @@ function manageClasses_eventsInitialRender() {
             var days = copy(classData.days[t]);
 
             var event = {
-                id: key + "_" + t, //crn stored as id
+                id: curCrn + "_" + t, //crn stored as id
                 title: classData.course, //use course name for event title
                 start: startTime,
                 end: endTime,
@@ -661,5 +730,5 @@ function manageClasses_eventsInitialRender() {
             events.push(event);
         }
     }
-    $("#calendar").fullCalendar('renderEvents', events);
+    calendar.fullCalendar('renderEvents', events);
 }

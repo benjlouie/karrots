@@ -67,6 +67,14 @@ function scheduleRegistration_classListSwitch(element) {
 
 //sets subject and classList based on selection
 function scheduleRegistration_subjectOnclick(element) {
+    var subject = element.innerText;
+    var oldSubject = localStorage.getItem("scheduleRegistration_currentSubject");
+    if (oldSubject == subject) {
+        //no chenge don't do anything
+        return;
+    }
+
+    //load the new subject's classes
     localStorage.setItem("scheduleRegistration_currentSubject", element.innerText);
     scheduleRegistration_initClassList();
 }
@@ -397,8 +405,12 @@ function scheduleRegistration_initClassList() {
 //fills the classList from kScheduleRegistration_subjectClasses in their given order
 function scheduleRegistration_fillClassList() {
     var subject = localStorage.getItem("scheduleRegistration_currentSubject");
+    var subjectText = document.getElementById("mc_scheduleRegistration_subjectText");
     var classTable = document.getElementById("mc_scheduleRegistration_classTable");
     var tbody = classTable.getElementsByTagName("tbody")[0];
+
+    //show current subject in menu bar
+    subjectText.innerText = subject;
 
     //clear it out
     while (tbody.firstChild) {
