@@ -361,6 +361,9 @@ function openMainContent_Mockups_ClassSchedule(element) {
 function openMainContent_Mockups_ManageClasses(element) {
     openMainContent_master(element, "html/maincontent/mockups/manageClasses.html", 3, true, true, true);
 }
+function openMainContent_Mockups_AssignProfessors(element){
+	openMainContent_master(element, "html/maincontent/mockups/assignProfessors.html", 2, true, true, false);
+}
 ////////////////////////////
 
 

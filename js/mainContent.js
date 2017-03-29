@@ -107,6 +107,12 @@ function eventClickHandler(event, jsevent, view) {
         $('#calendar').fullCalendar("rerenderEvents");
     }
 
+	//assign professors page
+	if (document.getElementById("mc_assingProfessors_section")) {
+       assignProfessors_eventClickHandler(event, jsevent, view);
+       $('#calendar').fullCalendar("rerenderEvents");
+    }
+	
     //scheduleRegistration
     if (document.getElementById("mc_scheduleRegistration_classTable")) {
         scheduleRegistration_eventClickHandler(event, jsevent, view);
@@ -163,6 +169,11 @@ function eventsInitialRender() {
     //manageClasses page
     if (document.getElementById("mc_manageClasses_input_crn")) {
         manageClasses_eventsInitialRender();
+    }
+	
+	//assign professors page
+	if (document.getElementById("mc_assingProfessors_section")) {
+        assignProfessors_eventsInitialRender();
     }
 
     //scheduleRegistration
