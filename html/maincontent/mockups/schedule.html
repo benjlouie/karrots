@@ -1,93 +1,8 @@
 ﻿<div id="mc_selectedClassList" class="mc_sideList mc_selectedClassList">
     <a class="mc_sideListHeader">Selected Classes</a>
     <!--List of selected classes-->
-    <ul>
-        <!--TODO: should be loaded dynamically-->
-        <li>
-            <a onclick="mc_sideListDetailToggle(this)">CSE 222<div class="mc_sideListDetailToggleIcon">+</div></a>
-            <div class="mc_sideListDetail">
-                <table class="mc_sideListDetail_class">
-                    <tr><th colspan="3">Systems Programming</th></tr>
-                    <tr><td colspan="3">Scott E. Lee Chadde</td></tr>
-                    <tr><td colspan="3">CRAMER 239</td></tr>
-                    <tr>
-                        <th colspan="2">Time</th>
-                        <th>Days</th>
-                    </tr>
-                    <tr>
-                        <td colspan="2">3:30pm - 4:45pm</td>
-                        <td>T R</td>
-                    </tr>
-                    <tr>
-                        <th colspan="2">CRN</th>
-                        <th>Hrs</th>
-                    </tr>
-                    <tr>
-                        <td colspan="2">70608</td>
-                        <td>3</td>
-                    </tr>
-                    <tr></tr>
-                    <tr>
-                        <th>Seats</th>
-                        <th>Limit</th>
-                        <th>Enroll</th>
-                    </tr>
-                    <tr>
-                        <td>10</td>
-                        <td>50</td>
-                        <td>40</td>
-                    </tr>
-                </table>
-            </div>
-        </li>
-        <li>
-            <a onclick="mc_sideListDetailToggle(this)">CSE 213<div class="mc_sideListDetailToggleIcon">+</div></a>
-            <div class="mc_sideListDetail">
-                <table class="mc_sideListDetail_class">
-                    <tr><th colspan="3">Obj Oriented Programming</th></tr>
-                    <tr><td colspan="3">Li P. Kuo</td></tr>
-                    <tr><td colspan="3">CRAMER 203</td></tr>
-                    <tr>
-                        <th colspan="2">Time</th>
-                        <th>Days</th>
-                    </tr>
-                    <tr>
-                        <td colspan="2">9:30am - 10:45am</td>
-                        <td>M T W R F</td>
-                    </tr>
-                    <tr>
-                        <th colspan="2">CRN</th>
-                        <th>Hrs</th>
-                    </tr>
-                    <tr>
-                        <td colspan="2">70881</td>
-                        <td>3</td>
-                    </tr>
-                    <tr></tr>
-                    <tr>
-                        <th>Seats</th>
-                        <th>Limit</th>
-                        <th>Enroll</th>
-                    </tr>
-                    <tr>
-                        <td>12</td>
-                        <td>45</td>
-                        <td>33</td>
-                    </tr>
-                </table>
-            </div>
-        </li>
-        <li><a onclick="mc_sideListDetailToggle(this)">overflow test<div class="mc_sideListDetailToggleIcon">+</div></a><div class="mc_sideListDetail">details</div></li>
-        <li><a onclick="mc_sideListDetailToggle(this)">overflow test<div class="mc_sideListDetailToggleIcon">+</div></a><div class="mc_sideListDetail">details</div></li>
-        <li><a onclick="mc_sideListDetailToggle(this)">overflow test<div class="mc_sideListDetailToggleIcon">+</div></a><div class="mc_sideListDetail">details</div></li>
-        <li><a onclick="mc_sideListDetailToggle(this)">overflow test<div class="mc_sideListDetailToggleIcon">+</div></a><div class="mc_sideListDetail">details</div></li>
-        <li><a onclick="mc_sideListDetailToggle(this)">overflow test<div class="mc_sideListDetailToggleIcon">+</div></a><div class="mc_sideListDetail">details</div></li>
-        <li><a onclick="mc_sideListDetailToggle(this)">overflow test<div class="mc_sideListDetailToggleIcon">+</div></a><div class="mc_sideListDetail">details</div></li>
-        <li><a onclick="mc_sideListDetailToggle(this)">overflow test<div class="mc_sideListDetailToggleIcon">+</div></a><div class="mc_sideListDetail">details</div></li>
-        <li><a onclick="mc_sideListDetailToggle(this)">overflow test<div class="mc_sideListDetailToggleIcon">+</div></a><div class="mc_sideListDetail">details</div></li>
-        <li><a onclick="mc_sideListDetailToggle(this)">overflow test<div class="mc_sideListDetailToggleIcon">+</div></a><div class="mc_sideListDetail">details</div></li>
-        <li><a onclick="mc_sideListDetailToggle(this)">overflow test<div class="mc_sideListDetailToggleIcon">+</div></a><div class="mc_sideListDetail">details</div></li>
-        <li><a onclick="mc_sideListDetailToggle(this)">overflow test<div class="mc_sideListDetailToggleIcon">+</div></a><div class="mc_sideListDetail">details</div></li>
+    <ul id="mc_scheduleRegistration_selectedClassList">
+        <!--should be loaded dynamically-->
     </ul>
 </div>
 
@@ -103,91 +18,25 @@
 
 <!--class table-->
 <div class="mc_classList">
-    <table>
+    <table id="mc_scheduleRegistration_classTable">
         <thead>
             <tr>
                 <th>Add/Rem</th>
-                <th>CRN</th>
-                <th>Course</th>
-                <th>Title</th>
-                <th>Time</th>
-                <th>Days</th>
-                <th>Instructor</th>
-                <th>Location</th>
-                <th>Hrs</th>
-                <th>Seats</th>
-                <th>Limit</th>
-                <th>Enroll</th>
+                <th onclick="scheduleRegistration_classListColClick('crn')">CRN</th>
+                <th onclick="scheduleRegistration_classListColClick('course')">Course</th>
+                <th onclick="scheduleRegistration_classListColClick('title')">Title</th>
+                <th onclick="scheduleRegistration_classListColClick('time')">Time</th>
+                <th onclick="scheduleRegistration_classListColClick('days')">Days</th>
+                <th onclick="scheduleRegistration_classListColClick('teacher')">Instructor</th>
+                <th onclick="scheduleRegistration_classListColClick('location')">Location</th>
+                <th onclick="scheduleRegistration_classListColClick('hrs')">Hrs</th>
+                <th onclick="scheduleRegistration_classListColClick('seats')">Seats</th>
+                <th onclick="scheduleRegistration_classListColClick('limit')">Limit</th>
+                <th onclick="scheduleRegistration_classListColClick('enroll')">Enroll</th>
             </tr>
         </thead>
         <tbody>
-            <!--TODO: loaded dynamically-->
-            <tr onclick="classListRowClick(this)">
-                <td onclick="classListSwitch(this)" class="mc_classList_addRemoveSwitch">Add</td>
-                <td>70608</td>
-                <td>CSE 222</td>
-                <td>Systems Programming</td>
-                <td>3:30pm - 4:45pm</td>
-                <td>T R</td>
-                <td>Scott E. Lee Chadde</td>
-                <td>CRAMER 239</td>
-                <td>3</td>
-                <td>10</td>
-                <td>50</td>
-                <td>40</td>
-            </tr>
-            <tr class="mc_classListDetail">
-                <td colspan="11">
-                    <div>
-                        conflict 1 <br />
-                        conflict 2
-                    </div>
-                </td>
-            </tr>
-            <tr onclick="classListRowClick(this)"><td onclick="classListSwitch(this)" class="mc_classList_addRemoveSwitch">Add</td><td>23846</td><td>CSE 223</td><td>Obj Oriented Programming</td><td>3:30pm - 4:45pm</td><td>T R</td><td>Overflow Test</td><td>CRAMER Overflow</td><td>3</td><td>10</td><td>50</td><td>40</td></tr>
-            <tr class="mc_classListDetail"><td colspan="11"><div>conflict <br />stuff in div<img src="img/favicon-96x96.png"/></div></td></tr>
-            <tr onclick="classListRowClick(this)"><td onclick="classListSwitch(this)" class="mc_classList_addRemoveSwitch">Add</td><td>0</td><td>CSE 0</td><td>Overflow Test</td><td>3:30pm - 4:45pm</td><td>T R</td><td>Overflow Test</td><td>CRAMER Overflow</td><td>3</td><td>10</td><td>50</td><td>40</td></tr>
-            <tr class="mc_classListDetail"><td colspan="11"></td></tr>
-            <tr onclick="classListRowClick(this)"><td onclick="classListSwitch(this)" class="mc_classList_addRemoveSwitch">Add</td><td>1</td><td>CSE 1</td><td>Overflow Test</td><td>3:30pm - 4:45pm</td><td>T R</td><td>Overflow Test</td><td>CRAMER Overflow</td><td>3</td><td>10</td><td>50</td><td>40</td></tr>
-            <tr class="mc_classListDetail"><td colspan="11"></td></tr>
-            <tr onclick="classListRowClick(this)"><td onclick="classListSwitch(this)" class="mc_classList_addRemoveSwitch">Add</td><td>2</td><td>CSE 2</td><td>Overflow Test</td><td>3:30pm - 4:45pm</td><td>T R</td><td>Overflow Test</td><td>CRAMER Overflow</td><td>3</td><td>10</td><td>50</td><td>40</td></tr>
-            <tr class="mc_classListDetail"><td colspan="11"></td></tr>
-            <tr onclick="classListRowClick(this)"><td onclick="classListSwitch(this)" class="mc_classList_addRemoveSwitch">Add</td><td>3</td><td>CSE 3</td><td>Overflow Test</td><td>3:30pm - 4:45pm</td><td>T R</td><td>Overflow Test</td><td>CRAMER Overflow</td><td>3</td><td>10</td><td>50</td><td>40</td></tr>
-            <tr class="mc_classListDetail"><td colspan="11"></td></tr>
-            <tr onclick="classListRowClick(this)"><td onclick="classListSwitch(this)" class="mc_classList_addRemoveSwitch">Add</td><td>4</td><td>CSE 4</td><td>Overflow Test</td><td>3:30pm - 4:45pm</td><td>T R</td><td>Overflow Test</td><td>CRAMER Overflow</td><td>3</td><td>10</td><td>50</td><td>40</td></tr>
-            <tr class="mc_classListDetail"><td colspan="11"></td></tr>
-            <tr onclick="classListRowClick(this)"><td onclick="classListSwitch(this)" class="mc_classList_addRemoveSwitch">Add</td><td>5</td><td>CSE 5</td><td>Overflow Test</td><td>3:30pm - 4:45pm</td><td>T R</td><td>Overflow Test</td><td>CRAMER Overflow</td><td>3</td><td>10</td><td>50</td><td>40</td></tr>
-            <tr class="mc_classListDetail"><td colspan="11"></td></tr>
-            <tr onclick="classListRowClick(this)"><td onclick="classListSwitch(this)" class="mc_classList_addRemoveSwitch">Add</td><td>6</td><td>CSE 6</td><td>Overflow Test</td><td>3:30pm - 4:45pm</td><td>T R</td><td>Overflow Test</td><td>CRAMER Overflow</td><td>3</td><td>10</td><td>50</td><td>40</td></tr>
-            <tr class="mc_classListDetail"><td colspan="11"></td></tr>
-            <tr onclick="classListRowClick(this)"><td onclick="classListSwitch(this)" class="mc_classList_addRemoveSwitch">Add</td><td>7</td><td>CSE 7</td><td>Overflow Test</td><td>3:30pm - 4:45pm</td><td>T R</td><td>Overflow Test</td><td>CRAMER Overflow</td><td>3</td><td>10</td><td>50</td><td>40</td></tr>
-            <tr class="mc_classListDetail"><td colspan="11"></td></tr>
-            <tr onclick="classListRowClick(this)"><td onclick="classListSwitch(this)" class="mc_classList_addRemoveSwitch">Add</td><td>8</td><td>CSE 8</td><td>Overflow Test</td><td>3:30pm - 4:45pm</td><td>T R</td><td>Overflow Test</td><td>CRAMER Overflow</td><td>3</td><td>10</td><td>50</td><td>40</td></tr>
-            <tr class="mc_classListDetail"><td colspan="11"></td></tr>
-            <tr onclick="classListRowClick(this)"><td onclick="classListSwitch(this)" class="mc_classList_addRemoveSwitch">Add</td><td>9</td><td>CSE 9</td><td>Overflow Test</td><td>3:30pm - 4:45pm</td><td>T R</td><td>Overflow Test</td><td>CRAMER Overflow</td><td>3</td><td>10</td><td>50</td><td>40</td></tr>
-            <tr class="mc_classListDetail"><td colspan="11"></td></tr>
-            <tr onclick="classListRowClick(this)"><td onclick="classListSwitch(this)" class="mc_classList_addRemoveSwitch">Add</td><td>10</td><td>CSE 10</td><td>Overflow Test</td><td>3:30pm - 4:45pm</td><td>T R</td><td>Overflow Test</td><td>CRAMER Overflow</td><td>3</td><td>10</td><td>50</td><td>40</td></tr>
-            <tr class="mc_classListDetail"><td colspan="11"></td></tr>
-            <tr onclick="classListRowClick(this)"><td onclick="classListSwitch(this)" class="mc_classList_addRemoveSwitch">Add</td><td>11</td><td>CSE 11</td><td>Overflow Test</td><td>3:30pm - 4:45pm</td><td>T R</td><td>Overflow Test</td><td>CRAMER Overflow</td><td>3</td><td>10</td><td>50</td><td>40</td></tr>
-            <tr class="mc_classListDetail"><td colspan="11"></td></tr>
-            <tr onclick="classListRowClick(this)"><td onclick="classListSwitch(this)" class="mc_classList_addRemoveSwitch">Add</td><td>12</td><td>CSE 12</td><td>Overflow Test</td><td>3:30pm - 4:45pm</td><td>T R</td><td>Overflow Test</td><td>CRAMER Overflow</td><td>3</td><td>10</td><td>50</td><td>40</td></tr>
-            <tr class="mc_classListDetail"><td colspan="11"></td></tr>
-            <tr onclick="classListRowClick(this)"><td onclick="classListSwitch(this)" class="mc_classList_addRemoveSwitch">Add</td><td>13</td><td>CSE 13</td><td>Overflow Test</td><td>3:30pm - 4:45pm</td><td>T R</td><td>Overflow Test</td><td>CRAMER Overflow</td><td>3</td><td>10</td><td>50</td><td>40</td></tr>
-            <tr class="mc_classListDetail"><td colspan="11"></td></tr>
-            <tr onclick="classListRowClick(this)"><td onclick="classListSwitch(this)" class="mc_classList_addRemoveSwitch">Add</td><td>14</td><td>CSE 14</td><td>Overflow Test</td><td>3:30pm - 4:45pm</td><td>T R</td><td>Overflow Test</td><td>CRAMER Overflow</td><td>3</td><td>10</td><td>50</td><td>40</td></tr>
-            <tr class="mc_classListDetail"><td colspan="11"></td></tr>
-            <tr onclick="classListRowClick(this)"><td onclick="classListSwitch(this)" class="mc_classList_addRemoveSwitch">Add</td><td>15</td><td>CSE 15</td><td>Overflow Test</td><td>3:30pm - 4:45pm</td><td>T R</td><td>Overflow Test</td><td>CRAMER Overflow</td><td>3</td><td>10</td><td>50</td><td>40</td></tr>
-            <tr class="mc_classListDetail"><td colspan="11"></td></tr>
-            <tr onclick="classListRowClick(this)"><td onclick="classListSwitch(this)" class="mc_classList_addRemoveSwitch">Add</td><td>16</td><td>CSE 16</td><td>Overflow Test</td><td>3:30pm - 4:45pm</td><td>T R</td><td>Overflow Test</td><td>CRAMER Overflow</td><td>3</td><td>10</td><td>50</td><td>40</td></tr>
-            <tr class="mc_classListDetail"><td colspan="11"></td></tr>
-            <tr onclick="classListRowClick(this)"><td onclick="classListSwitch(this)" class="mc_classList_addRemoveSwitch">Add</td><td>17</td><td>CSE 17</td><td>Overflow Test</td><td>3:30pm - 4:45pm</td><td>T R</td><td>Overflow Test</td><td>CRAMER Overflow</td><td>3</td><td>10</td><td>50</td><td>40</td></tr>
-            <tr class="mc_classListDetail"><td colspan="11"></td></tr>
-            <tr onclick="classListRowClick(this)"><td onclick="classListSwitch(this)" class="mc_classList_addRemoveSwitch">Add</td><td>18</td><td>CSE 18</td><td>Overflow Test</td><td>3:30pm - 4:45pm</td><td>T R</td><td>Overflow Test</td><td>CRAMER Overflow</td><td>3</td><td>10</td><td>50</td><td>40</td></tr>
-            <tr class="mc_classListDetail"><td colspan="11"></td></tr>
-            <tr onclick="classListRowClick(this)"><td onclick="classListSwitch(this)" class="mc_classList_addRemoveSwitch">Add</td><td>19</td><td>CSE 19</td><td>Overflow Test</td><td>3:30pm - 4:45pm</td><td>T R</td><td>Overflow Test</td><td>CRAMER Overflow</td><td>3</td><td>10</td><td>50</td><td>40</td></tr>
-            <tr class="mc_classListDetail"><td colspan="11"></td></tr>
-            <tr onclick="classListRowClick(this)"><td onclick="classListSwitch(this)" class="mc_classList_addRemoveSwitch">Add</td><td>20</td><td>CSE 20</td><td>Overflow Test</td><td>3:30pm - 4:45pm</td><td>T R</td><td>Overflow Test</td><td>CRAMER Overflow</td><td>3</td><td>10</td><td>50</td><td>40</td></tr>
-            <tr class="mc_classListDetail"><td colspan="11"></td></tr>
+            <!--loaded dynamically-->
         </tbody>
     </table>
 </div>
