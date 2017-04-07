@@ -673,15 +673,22 @@ function manageClasses_fillSubjectDropdown() {
         ul.removeChild(ul.firstChild);
     }
 
-    //fill ul with each subject
+    //sort subjects
+    var subjectList = [];
     for (var subject in kSubjects) {
+        subjectList.push(subject);
+    }
+    subjectList.sort();
+
+    //fill ul with each subject
+    for (var i = 0; i < subjectList.length; i++) {
         var li = document.createElement('li');
         li.className = 'mc_dropdownItem';
         var a = document.createElement('a');
         a.onclick = function () {
             manageClasses_subjectOnclick(this);
         };
-        var text = document.createTextNode(subject);
+        var text = document.createTextNode(subjectList[i]);
         a.appendChild(text);
         li.appendChild(a);
         ul.appendChild(li);
@@ -710,6 +717,13 @@ function manageClasses_loadSubjectEvents() {
         var classData = kClasses[curCrn];
         //add each time as an event
         for (var t = 0; t < classData.times.length; t++) {
+
+            if (classData.times[t].length == 0
+            || classData.days.length == 0
+            || classData.days[t].length == 0) {
+                //empty, no times or no days with those times
+                continue;
+            }
 
             var startTime = copy(classData.times[t][0]);
             var endTime = copy(classData.times[t][1]);

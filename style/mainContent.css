@@ -146,13 +146,13 @@
 .mc_selectedClassList {
     min-height: 55%;
     max-height: 55%;
-    width: 25%; /*paired with .mc_scheduleCalendar*/
+    width: 300px; /*paired with .mc_scheduleCalendar*/
 }
 .mc_sideListDetail_class {
     width: 100%;
     border-collapse: collapse;
 
-    font-size: 1.25vw; /*close enough*/
+    /*font-size: 1.25vw; /*close enough*/
     text-align: center;
 }
 .mc_sideListDetail_class, .mc_sideListDetail_class th, .mc_sideListDetail_class td {
@@ -167,7 +167,7 @@
 .mc_scheduleCalendar {
     float: left;
     height: 55%;
-    width: 75%; /*paired with .mc_sideList*/
+    width: calc(100% - 300px); /*paired with .mc_selectedClassList*/
     border:solid;
     border-width: 0px 0px 2px 0px;
 }

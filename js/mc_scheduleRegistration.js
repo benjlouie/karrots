@@ -361,15 +361,22 @@ function scheduleRegistration_fillSubjectDropdown() {
         ul.removeChild(ul.firstChild);
     }
 
-    //fill ul with each subject
+    //sort subjects
+    var subjectList = [];
     for (var subject in kSubjects) {
+        subjectList.push(subject);
+    }
+    subjectList.sort();
+
+    //fill ul with each subject
+    for (var i = 0; i < subjectList.length; i++) {
         var li = document.createElement('li');
         li.className = 'mc_dropdownItem';
         var a = document.createElement('a');
         a.onclick = function () {
             scheduleRegistration_subjectOnclick(this);
         };
-        var text = document.createTextNode(subject);
+        var text = document.createTextNode(subjectList[i]);
         a.appendChild(text);
         li.appendChild(a);
         ul.appendChild(li);
@@ -464,7 +471,17 @@ function scheduleRegistration_getSortFunc(sortAttribute) {
                 a = kClasses[a];
                 b = kClasses[b];
                 //only compare startTime of first time
-                return a.times[0][0].localeCompare(b.times[0][0]);
+                if (a.times.length == 0 || a.times[0].length == 0) {
+                    aCmp = "";
+                } else {
+                    aCmp = a.times[0][0];
+                }
+                if (b.times.length == 0 || b.times[0].length == 0) {
+                    bCmp = "";
+                } else {
+                    bCmp = b.times[0][0];
+                }
+                return aCmp.localeCompare(bCmp);
             };
         case 'day':
         case 'days':
@@ -472,7 +489,17 @@ function scheduleRegistration_getSortFunc(sortAttribute) {
                 a = kClasses[a];
                 b = kClasses[b];
                 //only compare first day of first time
-                return a.days[0][0] - b.days[0][0];
+                if (a.days.length == 0 || a.days[0].length == 0) {
+                    aCmp = -1;
+                } else {
+                    aCmp = a.days[0][0];
+                }
+                if (b.days.length == 0 || b.days[0].length == 0) {
+                    bCmp = -1;
+                } else {
+                    bCmp = b.days[0][0];
+                }
+                return aCmp - bCmp;
             };
         case 'teacher':
         case 'instructor':
