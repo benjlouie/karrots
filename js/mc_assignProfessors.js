@@ -1,38 +1,19 @@
 function assignProfessors_eventsInitialRender() {
 		var colors = {
 		"TBD" : "#5f5f5f",
-        "Professor Chadde": "red",
-        "Professor Shin": "blue",
-        "Professor Kuo": "green",
-        "Professor Zheng": "orange",
+        "Scott E. Lee Chadde": "red",
+        "Dongwan Shin": "blue",
+        "Li P. Kuo": "green",
+        "Jun Zheng": "orange",
+		"Subhasish Mazumdar": "#5f5f5f",
+		"Abdelmounaam Rezgui": "#5f5f5f",
+		"Blaine W. Burnham": "#5f5f5f",
+		"Hamdy Soliman": "#5f5f5f",
+		"Lorie M. Liebrock": "#5f5f5f",
+		"Lyndon G. Pierson": "#5f5f5f",
     };
-	
-    var events = [];
-    for (key in kClasses) {
-        classData = kClasses[key];
-        //add each time as an event
-        for (var t = 0; t < classData.times.length; t++) {
-
-            var startTime = copy(classData.times[t][0]);
-            var endTime = copy(classData.times[t][1]);
-            var days = copy(classData.days[t]);
-
-            var event = {
-                id: key + "_" + t, //crn stored as id
-                title: classData.course, //use course name for event title
-                start: startTime,
-                end: endTime,
-                dow: days,
-                color: colors[classData.teacher],
-                borderColor: 'black',
-                textColor: 'black',
-                editable: false,
-                className: "calendarEvent_moreBorder",
-            };
-            events.push(event);
-        }
-    }
-    $("#calendar").fullCalendar('renderEvents', events);
+	assignProfessors_loadSubjectEvents();
+    
 }
 
 function assignProfessors_eventClickHandler(event, jsevent, view) {
@@ -139,14 +120,85 @@ function assignProfessors_previewSelected() {
     
 }
 
+function assignProfessors_loadSubjectEvents() {
+    
+				var colors = {
+		"TBD" : "#5f5f5f",
+        "Scott E. Lee Chadde": "red",
+        "Dongwan Shin": "blue",
+        "Li P. Kuo": "green",
+        "Jun Zheng": "orange",
+		"Subhasish Mazumdar": "#5f5f5f",
+		"Abdelmounaam Rezgui": "#5f5f5f",
+		"Blaine W. Burnham": "#5f5f5f",
+		"Hamdy Soliman": "#5f5f5f",
+		"Lorie M. Liebrock": "#5f5f5f",
+		"Lyndon G. Pierson": "#5f5f5f",
+		
+    };
+    var subjectClasses = kSubjects["CSE"];
+
+    //clear selected crn
+    //manageClasses_clearSelection();
+
+    //load subjectText in menuBar
+    //var subjectText = document.getElementById("mc_manageClasses_subjectText");
+    //subjectText.innerText = subject;
+
+    var calendar = $("#calendar");
+    //clear old events
+    calendar.fullCalendar('removeEvents');
+
+    var events = [];
+    for (var i = 0; i < subjectClasses.length; i++) {
+        var curCrn = subjectClasses[i];
+        var classData = kClasses[curCrn];
+        //add each time as an event
+        for (var t = 0; t < classData.times.length; t++) {
+
+            if (classData.times[t].length == 0
+            || classData.days.length == 0
+            || classData.days[t].length == 0) {
+                //empty, no times or no days with those times
+                continue;
+            }
+
+            var startTime = copy(classData.times[t][0]);
+            var endTime = copy(classData.times[t][1]);
+            var days = copy(classData.days[t]);
+			var teacher = copy(classData.teacher);
+
+            var event = {
+                id: curCrn + "_" + t, //crn stored as id
+                title: classData.course, //use course name for event title
+                start: startTime,
+                end: endTime,
+                dow: days,
+                color: colors[teacher],
+                borderColor: 'black',
+                textColor: 'black',
+                editable: true,
+                className: "calendarEvent_moreBorder",
+            };
+            events.push(event);
+        }
+    }
+    calendar.fullCalendar('renderEvents', events);
+}
 
 function assignProfessor(element){
 	var colors = {
 		"TBD" : "#5f5f5f",
-        "Professor Chadde": "red",
-        "Professor Shin": "blue",
-        "Professor Kuo": "green",
-        "Professor Zheng": "orange",
+        "Scott E. Lee Chadde": "red",
+        "Dongwan Shin": "blue",
+        "Li P. Kuo": "green",
+        "Jun Zheng": "orange",
+		"Subhasish Mazumdar": "#5f5f5f",
+		"Abdelmounaam Rezgui": "#5f5f5f",
+		"Blaine W. Burnham": "#5f5f5f",
+		"Hamdy Soliman": "#5f5f5f",
+		"Lorie M. Liebrock": "#5f5f5f",
+		"Lyndon G. Pierson": "#5f5f5f",
     };
 	
 	
